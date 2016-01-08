@@ -8,7 +8,7 @@ namespace Danny.Authority.Data
     /**
      * @ 权限类型
      * */
-    public class PermissionsTypeData
+    public class PermData
     {
         /**
          * @ 类型编号，主键
@@ -18,9 +18,5 @@ namespace Danny.Authority.Data
          * @ 类型名称
          * */
         public string Name { get; set; }
-        /**
-         * @ 类型编码
-         * */
-        public string Code { get; set; }
     }
 }

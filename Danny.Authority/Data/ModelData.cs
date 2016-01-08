@@ -8,7 +8,7 @@ namespace Danny.Authority.Data
     /**
      * @ 模块操作实体类
      * */
-    public class OperatorData
+    public class ModelData
     {
         /**
          * @ 操作编号，主键
@@ -19,9 +19,13 @@ namespace Danny.Authority.Data
          * */
         public string Name { get; set; }
         /**
-         * @ 所属领域
+         * @ 所属命名空间
          * */
-        public string Domain { get; set; }
+        public string NameSpace { get; set; }
+        /**
+         * @ 函数名称
+         * */
+        public string Method { get; set; }
         /**
          * @ 操作编码
          * */

@@ -9,8 +9,11 @@ using System.Data.Odbc;
 using System.Data.OleDb;
 using System.Data.Common;
 using System.Configuration;
+using System.Data.SQLite;
+using System.Data.SQLite.Generic;
 using Danny.Lib.Enums;
 using Danny.Lib.Extension;
+
 
 
 namespace Danny.Lib.Helpers
@@ -33,10 +36,12 @@ namespace Danny.Lib.Helpers
 
         /**
          * @ 构造函数第一次重载，自动构造数据连接对象
+         * @ dbType 数据库类型
          * @ connectionString 数据库连接字符串
          * */
-        public SQLContext(string connectionString)
+        public SQLContext(SQLDataBaseType dbType, string connectionString)
         {
+            this.dbType = dbType;
             this.connectionString = connectionString;
         }
 
@@ -64,7 +69,7 @@ namespace Danny.Lib.Helpers
                 ConnectionStringSettings conSett = ConfigurationManager.ConnectionStrings[defaultConnectionString];
                 if (conSett == null)
                 {
-                    throw new ArgumentNullException("如果使用默认的LdfContext构造函数，必须在主程序配置文件中配置节点：connectionStrings，并添加一个add name为defaultConnectionString的数据库连接字符串");
+                    throw new ArgumentNullException("如果使用默认的SQLContext构造函数，必须在主程序配置文件中配置节点：connectionStrings，并添加一个add name为defaultConnectionString的数据库连接字符串");
                 }
                 connectionString = conSett.ConnectionString;
                 if (connectionString.IsNullOrEmpty())
@@ -97,6 +102,9 @@ namespace Danny.Lib.Helpers
                     break;
                 case SQLDataBaseType.ORACLE:
                     break;
+                case SQLDataBaseType.SQLITE:
+                    conn = new SQLiteConnection(connectionString);
+                    break;
                 default:
                     throw new ArgumentException("数据库类型不存在！");
             }
@@ -121,6 +129,9 @@ namespace Danny.Lib.Helpers
                     break;
                 case SQLDataBaseType.ORACLE:
                     break;
+                case SQLDataBaseType.SQLITE:
+                    ccmd = new SQLiteCommand((SQLiteConnection)DbConn);
+                    break;
                 default:
                     throw new ArgumentException("数据库类型不存在！");
             }
@@ -136,7 +147,7 @@ namespace Danny.Lib.Helpers
             switch (dbType)
             {
                 case SQLDataBaseType.MSSQL:
-                    adapter = new SqlDataAdapter();
+                    adapter = new SqlDataAdapter((SqlCommand)ccmd);
                     break;
                 case SQLDataBaseType.ACCESS:
                     adapter = new OleDbDataAdapter();
@@ -144,6 +155,9 @@ namespace Danny.Lib.Helpers
                 case SQLDataBaseType.MYSQL:
                     break;
                 case SQLDataBaseType.ORACLE:
+                    break;
+                case SQLDataBaseType.SQLITE:
+                    adapter = new SQLiteDataAdapter((SQLiteCommand)ccmd);
                     break;
                 default:
                     throw new ArgumentException("数据库类型不存在！");
@@ -166,6 +180,8 @@ namespace Danny.Lib.Helpers
                     break;
                 case SQLDataBaseType.ORACLE:
                     break;
+                case SQLDataBaseType.SQLITE:
+                    return new SQLiteParameter();
                 default:
                     throw new ArgumentException("数据库类型不存在！");
             }

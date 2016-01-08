@@ -38,8 +38,8 @@ namespace Danny.Lib.Helpers
          *  @ 默认构造函数
          *  @connectionString 数据库连接字符串
          * */
-        protected SQLHelper(string connectionString)
-            : this(new SQLContext(connectionString))
+        protected SQLHelper(SQLDataBaseType dbType, string connectionString)
+            : this(new SQLContext(dbType, connectionString))
         {
 
         }

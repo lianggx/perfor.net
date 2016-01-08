@@ -47,13 +47,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\DataType.cs" />
     <Compile Include="Data\FileData.cs" />
     <Compile Include="Data\MenuData.cs" />
-    <Compile Include="Data\OperatorData.cs" />
+    <Compile Include="Data\ModelData.cs" />
     <Compile Include="Data\PageData.cs" />
-    <Compile Include="Data\PermissionsTypeData.cs" />
+    <Compile Include="Data\PermData.cs" />
+    <Compile Include="Data\PermToFunc.cs" />
     <Compile Include="Data\RoleData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\MenuDataService.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -73,8 +76,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\Danny.Lib\Danny.Lib.csproj">
+      <Project>{c7698b2d-0b92-480d-a56a-dc27bba51040}</Project>
+      <Name>Danny.Lib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -21,6 +21,6 @@ namespace Danny.Authority.Data
         /**
          * @ 角色编码
          * */
-        public string Code { get; set; }
+        public string Description { get; set; }
     }
 }

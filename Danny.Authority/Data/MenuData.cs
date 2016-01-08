@@ -23,6 +23,10 @@ namespace Danny.Authority.Data
          * */
         public string Name { get; set; }
         /**
+         * @ 上级路径链，如1.2.3.4
+         * */
+        public string ParentPath { get; set; }
+        /**
          * @ 菜单URL
          * */
         public string Url { get; set; }

@@ -14,6 +14,6 @@ namespace Danny.Lib.Helpers
         ACCESS = 1001,
         MYSQL = 2000,
         ORACLE = 3000,
-        SQLLITE = 4000
+        SQLITE = 4000
     }
 }
