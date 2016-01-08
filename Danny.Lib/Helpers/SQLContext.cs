@@ -355,14 +355,14 @@ namespace Danny.Lib.Helpers
             if (disposing)
                 return;
 
-            Clear();
+            Close();
             disposing = true;
         }
 
         /**
          * @ 清理资源
          * */
-        public void Clear()
+        public void Close()
         {
             try
             {

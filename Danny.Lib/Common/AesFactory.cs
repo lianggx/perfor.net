@@ -26,8 +26,8 @@ namespace Danny.Lib.Common
          * */
         public AesFactory()
         {
-            this.IV = CRYPT_IV;
-            this.Key = CRYPT_KEY;
+            base.IV = CRYPT_IV;
+            base.Key = CRYPT_KEY;
         }
 
         /**
@@ -52,13 +52,11 @@ namespace Danny.Lib.Common
             ICryptoTransform transform = CreateEncryptor(this.Key, this.IV);
             using (MemoryStream msCrypto = new MemoryStream())
             {
-                using (CryptoStream csCrypto = new CryptoStream(msCrypto, transform, CryptoStreamMode.Write))
-                {
-                    csCrypto.Write(crypt, 0, crypt.Length);
-                    csCrypto.FlushFinalBlock();
-                    byte[] bytes = msCrypto.ToArray();
-                    result = bytes.ToBase64();
-                }
+                CryptoStream csCrypto = new CryptoStream(msCrypto, transform, CryptoStreamMode.Write);
+                csCrypto.Write(crypt, 0, crypt.Length);
+                csCrypto.FlushFinalBlock();
+                byte[] bytes = msCrypto.ToArray();
+                result = bytes.ToBase64();
             }
             return result;
         }
@@ -87,13 +85,9 @@ namespace Danny.Lib.Common
             ICryptoTransform transform = CreateDecryptor(this.Key, this.IV);
             using (MemoryStream msCrypto = new MemoryStream(encrypt))
             {
-                using (CryptoStream csCrypto = new CryptoStream(msCrypto, transform, CryptoStreamMode.Read))
-                {
-                    using (StreamReader swCrypto = new StreamReader(csCrypto))
-                    {
-                        result = swCrypto.ReadToEnd();
-                    }
-                }
+                CryptoStream csCrypto = new CryptoStream(msCrypto, transform, CryptoStreamMode.Read);
+                StreamReader swCrypto = new StreamReader(csCrypto);
+                result = swCrypto.ReadToEnd();
             }
 
             return result;

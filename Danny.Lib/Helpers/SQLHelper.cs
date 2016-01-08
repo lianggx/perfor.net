@@ -322,7 +322,7 @@ namespace Danny.Lib.Helpers
             if (disposing)
                 return;
 
-            context.Clear();
+            context.Close();
         }
 
         /**
