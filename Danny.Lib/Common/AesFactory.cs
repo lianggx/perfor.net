@@ -16,18 +16,71 @@ namespace Danny.Lib.Common
      * */
     public class AesFactory : Aes
     {
-        // 初始化标准KEY（32位）
-        private static byte[] CRYPT_KEY = { 0xe8, 0xbf, 0x99, 0xe6, 0x98, 0xaf, 0x64, 0x61, 0x6e, 0x6e, 0x79, 0xe5, 0x88, 0x9b, 0xe5, 0xbb, 0xba, 0xe7, 0x9a, 0x84, 0xe5, 0x8a, 0xa0, 0xe5, 0xaf, 0x86, 0xe7, 0x9a, 0x84, 0x4b, 0x45, 0x59 };
-        // 向量（16位）
-        private static byte[] CRYPT_IV = { 0xe8, 0xbf, 0x99, 0xe6, 0x98, 0xaf, 0x64, 0x61, 0x6e, 0x6e, 0x79, 0xe5, 0x88, 0x9b, 0xe5, 0xbb };
+        #region Identity
+        // 默认 key（32位）注意：生产环境请勿使用默认 key
+        private byte[] crypt_key = { 0xe8, 0xbf, 0x99, 0xe6, 0x98, 0xaf, 0x64, 0x61, 0x6e, 0x6e, 0x79, 0xe5, 0x88, 0x9b, 0xe5, 0xbb, 0xba, 0xe7, 0x9a, 0x84, 0xe5, 0x8a, 0xa0, 0xe5, 0xaf, 0x86, 0xe7, 0x9a, 0x84, 0x4b, 0x45, 0x59 };
+        // 默认 向量（16位）注意：生产环境请勿使用默认 iv
+        private byte[] crypt_iv = { 0xe8, 0xbf, 0x99, 0xe6, 0x98, 0xaf, 0x64, 0x61, 0x6e, 0x6e, 0x79, 0xe5, 0x88, 0x9b, 0xe5, 0xbb };
+        #endregion
 
         /**
          * @ 默认构造函数
+         * @ useDefaultKey 是否使用默认的 key 和 iv，为避免埋雷，这里设置默认不使用
          * */
-        public AesFactory()
+        public AesFactory(bool useDefaultKey = false)
         {
-            base.IV = CRYPT_IV;
-            base.Key = CRYPT_KEY;
+            if (useDefaultKey == false)
+            {
+                new Random(32).NextBytes(this.crypt_key);
+                new Random(16).NextBytes(this.crypt_iv);
+            }
+        }
+        
+        /**
+         * @ 构造函数第三次重载，使用指定的 key 和 iv 填充加密工厂
+         * @ key 钥匙
+         * @ iv 向量
+         * */
+        public AesFactory(string key, string iv)
+        {
+            if (key.IsNullOrEmpty())
+                throw new ArgumentException("参数 key 不能为空");
+            if (iv.IsNullOrEmpty())
+                throw new ArgumentException("参数 key 不能为空并");
+
+            byte[] b_key = Encoding.UTF8.GetBytes(key);
+            byte[] b_iv = Encoding.UTF8.GetBytes(iv);
+            int len = this.crypt_key.Length;
+            int b_len = b_key.Length;
+            for (int i = 0; i < len; i++)
+            {
+                this.crypt_key[i] = b_key[i];
+                if (i + 1 == b_len) break;
+            }
+
+            len = this.crypt_iv.Length;
+            b_len = b_iv.Length;
+            for (int i = 0; i < len; i++)
+            {
+                this.crypt_iv[i] = b_iv[i];
+                if (i + 1 == b_len) break;
+            }
+        }
+
+        /**
+         * @ 构造函数第二次重载，使用指定的 key 和 iv 填充加密工厂
+         * @ key 钥匙，长度为 32 位 byte 数组
+         * @ iv 向量，长度为 16 位 byte 数组
+         * */
+        public AesFactory(byte[] key, byte[] iv)
+        {
+            if (key.IsNotNullAndEq(32) == false)
+                throw new ArgumentException("参数 key 不能为空并且长度必须等于32");
+            if (iv.IsNotNullAndEq(16) == false)
+                throw new ArgumentException("参数 iv 不能为空并且长度必须等于16");
+
+            this.crypt_key = key;
+            this.crypt_iv = iv;
         }
 
         /**
@@ -122,7 +175,7 @@ namespace Danny.Lib.Common
          * */
         public override void GenerateIV()
         {
-            new Random(16).NextBytes(this.IV);
+            new Random(16).NextBytes(this.crypt_iv);
         }
 
         /**
@@ -130,7 +183,40 @@ namespace Danny.Lib.Common
          * */
         public override void GenerateKey()
         {
-            new Random(32).NextBytes(this.Key);
+            new Random(32).NextBytes(this.crypt_key);
         }
+
+        #region Properties
+        /**
+         * @ 向量
+         * */
+        public override byte[] IV
+        {
+            get
+            {
+                return crypt_iv;
+            }
+            set
+            {
+                crypt_iv = value;
+            }
+        }
+
+
+        /**
+         * @ 钥匙
+         * */
+        public override byte[] Key
+        {
+            get
+            {
+                return crypt_key;
+            }
+            set
+            {
+                crypt_key = value;
+            }
+        }
+        #endregion
     }
 }

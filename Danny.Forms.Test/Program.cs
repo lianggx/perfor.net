@@ -317,12 +317,12 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
                 list.Add(cus);
             }
             string json = list.ObjToJson();
-            AesFactory encrypt = new AesFactory();
+            AesFactory encrypt = new AesFactory("b","a");
             string result = encrypt.Encrypt(json);
 
             Console.WriteLine(result);
 
-            AesFactory decrypt = new AesFactory();
+            AesFactory decrypt = new AesFactory("b","a");
             result = decrypt.Decrypt(result);
 
             Console.WriteLine(result);

@@ -73,7 +73,7 @@ namespace Danny.Lib.Extension
          * @ 判断数组是否不为空，并且长度等于 @len
          * @ len 数组长度
          * */
-        public static bool IsNotNullAndEq(this IEnumerable<string> array, int len)
+        public static bool IsNotNullAndEq<T>(this IEnumerable<T> array, int len)
         {
             bool isEq = array != null && array.Count() == len;
 
@@ -84,7 +84,7 @@ namespace Danny.Lib.Extension
          * @ 判断数组是否不为空，并且长度大于等于 @len
          * @ len 数组长度
          * */
-        public static bool IsNotNullAndGtEq(this IEnumerable<string> array, int len)
+        public static bool IsNotNullAndGtEq<T>(this IEnumerable<T> array, int len)
         {
             bool isEq = array != null && array.Count() >= len;
 
