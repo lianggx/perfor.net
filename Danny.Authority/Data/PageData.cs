@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Danny.Lib.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace Danny.Authority.Data
         /**
          * @ 页面元素编号，自动主键，关联权限类型
          * */
+        [SQLEntityKey(PrimaryKey = true)]
         public string ID { get; set; }
         /**
          * @ 页面元素名称

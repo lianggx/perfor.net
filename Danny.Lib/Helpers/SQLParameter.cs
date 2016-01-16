@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Danny.Lib.Extension;
+
 namespace Danny.Lib.Helpers
 {
     /**
@@ -19,7 +21,7 @@ namespace Danny.Lib.Helpers
          * @ fields 字段列表
          * @ values 值列表
          * */
-        public SQLParameter(string[] fields, object[] values)
+        public SQLParameter(IEnumerable<string> fields, IEnumerable<object> values)
         {
             this.fields = fields;
             this.values = values;
@@ -31,30 +33,42 @@ namespace Danny.Lib.Helpers
          * @ values 值列表
          * @ primaryKeyIndex 实体键在fields参数列表中的索引
          * */
-        public SQLParameter(string[] fields, object[] values, int primaryKeyIndex)
+        public SQLParameter(IEnumerable<string> fields, IEnumerable<object> values, int primaryKeyIndex)
         {
             this.fields = fields;
             this.values = values;
             this.primarykeyindex = primaryKeyIndex;
         }
 
-        private string[] fields = null;
+        private IEnumerable<string> fields = null;
         /**
          * @ 字段名称
          * */
-        public string[] Fields
+        public List<string> Fields
         {
-            get { return fields; }
+            get
+            {
+                if (fields.IsNullOrEmpty())
+                    fields = new List<string>();
+
+                return fields.ToList();
+            }
             set { fields = value; }
         }
 
-        private object[] values = null;
+        private IEnumerable<object> values = null;
         /**
          * @ 字段对应的值
          * */
-        public object[] Values
+        public List<object> Values
         {
-            get { return values; }
+            get
+            {
+                if (values.IsNullOrEmpty())
+                    values = new List<object>();
+
+                return values.ToList();
+            }
             set { values = value; }
         }
 

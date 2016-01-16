@@ -158,9 +158,9 @@ namespace Danny.Lib.Helpers.Mssql
                 StringBuilder insertBuilder = new StringBuilder(" INSERT");
                 StringBuilder valuesBuilder = new StringBuilder(" VALUES(");
                 insertBuilder.AppendFormat(" {0}(", TableName);
-                string[] fields = item.Fields;
-                object[] values = item.Values;
-                int len = fields.Length;
+                List<string> fields = item.Fields;
+                List<object> values = item.Values;
+                int len = fields.Count;
                 for (int i = 0; i < len; i++)
                 {
                     string field = fields[i];

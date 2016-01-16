@@ -25,6 +25,8 @@ using Danny.Lib.Web;
 using Danny.Lib.Common;
 using Danny.Lib.Helpers.Mssql;
 using Danny.Lib.Xml;
+using Danny.Authority.Services;
+using Danny.Authority.Data;
 
 namespace Danny.Forms.Test
 {
@@ -38,7 +40,7 @@ namespace Danny.Forms.Test
         {
             //string id = Guid.NewGuid().ToString("N");
 
-            TestCryptor();
+            TestMenuData();
             Console.WriteLine("succeed");
             Console.ReadKey();
 
@@ -114,9 +116,7 @@ namespace Danny.Forms.Test
         static void DeleteTest()
         {
             MssqlDelete delete = new MssqlDelete();
-            Customers cus = new Customers();
-            cus.ID = "00000db144494225b9482d6cf9cac5f0";
-            delete.DeleteObject<Customers>(cus);
+            delete.AddWhere("ID", "00000db144494225b9482d6cf9cac5f0");
             delete.SaveChange();
         }
 
@@ -146,7 +146,8 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             //read.AddWhere("A.UserName", "李进");
             //read.AddBracketRight();
             int rowCount = 0;
-            IEnumerable<SQLDataResult> list = read.Select("ID", fields, leftJoin, 1, 20, out rowCount);
+            read.PrimaryKey = "ID";
+            IEnumerable<SQLDataResult> list = read.Select(fields, leftJoin, 1, 20, out rowCount);
             foreach (var item in list)
             {
                 Console.WriteLine("ID:{0}", item["ID"]);
@@ -317,15 +318,46 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
                 list.Add(cus);
             }
             string json = list.ObjToJson();
-            AesFactory encrypt = new AesFactory("b","a");
+            AesFactory encrypt = new AesFactory("b", "a");
             string result = encrypt.Encrypt(json);
 
             Console.WriteLine(result);
 
-            AesFactory decrypt = new AesFactory("b","a");
+            AesFactory decrypt = new AesFactory("b", "a");
             result = decrypt.Decrypt(result);
 
             Console.WriteLine(result);
+        }
+
+        /**
+         * @ 测试菜单管理
+         * */
+        static void TestMenuData()
+        {
+            //MenuDataService menudata = new MenuDataService();
+            //bool hasChildren = menudata.HasChildren("80b86ce6cd30467aaaa8f9eb35e74187");
+            //List<MenuData> array = new List<MenuData>();
+            //array.Add(new MenuData() { Name = "系统管理", Url = "/admin/index" });
+            //array.Add(new MenuData() { Name = "用户管理", Url = "/user/index" });
+            //array.Add(new MenuData() { Name = "文件管理", Url = "/file/index" });
+            //array.Add(new MenuData() { Name = "页面元素管理", Url = "/pager/index" });
+            //array.Add(new MenuData() { Name = "角色管理", Url = "/role/index" });
+            //array.Add(new MenuData() { Name = "机构管理", Url = "/dept/index" });
+            //array.Add(new MenuData() { Name = "机构列表", Url = "/dept/list", PID = "0443f86369e5462cb48035ed8b413abc" });            
+            //array.Add(new MenuData() { Name = "新增用户", Url = "/user/new", PID = "80b86ce6cd30467aaaa8f9eb35e74187" });
+            //array.Add(new MenuData() { Name = "修改用户", Url = "/user/edit", PID = "80b86ce6cd30467aaaa8f9eb35e74187" });
+            //menudata.Add(array);
+
+            PermToFuncService menudata = new PermToFuncService();
+            //List<PermToFunc> array = new List<PermToFunc>();
+            //array.Add(new PermToFunc() { DataType = FuncDataType.Menu, Perm_ID = "259ee1d5ff414b01a9f1ba378981f9b1", Func_ID = "7a585113cdb64d09bee3ca6f0749dc3d" });
+            //array.Add(new PermToFunc() { DataType = FuncDataType.Menu, Perm_ID = "32b4f86b3430417ba58d9ed799c46ee6", Func_ID = "3872485a5814485fb1f9761a25c0b034" });
+            //array.Add(new PermToFunc() { DataType = FuncDataType.Menu, Perm_ID = "882911388ca9447096c9fcecc7c8cde9", Func_ID = "" });
+            //menudata.Add(array);
+             List<SQLDataResult> list = menudata.GetMeumByPermId("259ee1d5ff414b01a9f1ba378981f9b1");
+
+            Console.WriteLine("");
+
         }
     }
 }

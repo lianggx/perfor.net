@@ -43,18 +43,28 @@ namespace Danny.Lib.Helpers.Mssql
          * @ fields 要更新的字段名称
          * @ values 字段对应的值 
          * */
-        public void UpdateObject(string[] fields, object[] values, int primaryKeyIndex = -1)
+        public void AddUpdate(string field, object value)
         {
-            AddObject(fields, values, primaryKeyIndex);
+            ArrayUpdate.Add(field, value);
         }
 
         /**
           * @ 初始化SQL插入语句，该方法使用反射，性能有所降低，请酌情使用
           * @  obj 要删除对象，必须给主键配置特性LdfSQLEntityKey.PrimaryKey=true
           * */
-        public void UpdateObject<T>(T obj) where T : class,new()
+        public void UpdateObject<T>(T obj, params string[] filterFields) where T : class,new()
         {
-            AddObject<T>(obj, Enums.SQLOption.UPDATE);
+            PropertyInfo[] piArray = obj.GetType().GetProperties();
+            int len = piArray.Length;
+
+            for (int i = 0; i < len; i++)
+            {
+                PropertyInfo pi = piArray[i];
+                if (filterFields.Contains<string>(pi.Name))
+                    continue;
+
+                ArrayUpdate.Add(pi.Name, pi.GetValue(obj, null));
+            }
         }
 
         /**
@@ -84,38 +94,50 @@ namespace Danny.Lib.Helpers.Mssql
             {
                 throw new ArgumentException("更新目标数据库表名：tablename不能为空！");
             }
+            string updateString = GetUpdateFields();
+            string whereString = GetCondition();
 
-            StringBuilder updateBuilder = new StringBuilder();
-            foreach (var item in Parameters)
-            {
-                if (item.PrimaryKeyIndex == -1)
-                    throw new ArgumentNullException("更新操作必须指定主键在参数列表中的索引：PrimaryKeyIndex");
-                updateBuilder.AppendFormat(" UPDATE {0} SET ", TableName);
-
-                string[] fields = item.Fields;
-                object[] values = item.Values;
-                int len = fields.Length;
-                DbParameter pkParam = null;
-                for (int i = 0; i < len; i++)
-                {
-                    string field = fields[i];
-                    DbParameter para = AddParameter(field, values[i]);
-                    updateBuilder.AppendFormat("{0}={1}", field, para.ParameterName);
-                    if (i + 1 < len)
-                    {
-                        updateBuilder.Append(",");
-                    }
-                    if (i == item.PrimaryKeyIndex)
-                        pkParam = para;
-                }
-                updateBuilder.AppendFormat(" WHERE {0}={1}", fields[item.PrimaryKeyIndex], pkParam.ParameterName);
-                updateBuilder.AppendLine();
-            }
-            SQLCmdText = updateBuilder.ToString().ToTrimSpace();
+            SQLCmdText = string.Format("UPDATE {0} SET {1} {2}", TableName, updateString, whereString);
             return SQLCmdText.IsNotNull();
         }
 
+        /**
+         * @ 获取要更新的字段
+         * */
+        private string GetUpdateFields()
+        {
+            int len = ArrayUpdate.Count;
+            if (len == 0)
+                return string.Empty;
+
+            int index = 0;
+            StringBuilder updateBuilder = new StringBuilder();
+            foreach (var key in ArrayUpdate.Keys)
+            {
+                object value = ArrayUpdate[key];
+                DbParameter par = AddParameter(key, value);
+                updateBuilder.AppendFormat(" {0}={1}{2}", key, par.ParameterName, index + 1 == len ? "" : ",");
+                index++;
+            }
+            return updateBuilder.ToString();
+        }
+
         #region Properties
+        private Dictionary<string, object> arrayUpdate = null;
+        /**
+         * @ 要更新的字段
+         * */
+        public Dictionary<string, object> ArrayUpdate
+        {
+            get
+            {
+                if (arrayUpdate == null)
+                    arrayUpdate = new Dictionary<string, object>();
+
+                return arrayUpdate;
+            }
+            set { arrayUpdate = value; }
+        }
         #endregion
     }
 }

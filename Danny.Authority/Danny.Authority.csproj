@@ -11,6 +11,7 @@
     <AssemblyName>Danny.Authority</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -47,6 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthoritySet.cs" />
+    <Compile Include="Data\AccessLevel.cs" />
     <Compile Include="Data\DataType.cs" />
     <Compile Include="Data\FileData.cs" />
     <Compile Include="Data\MenuData.cs" />
@@ -55,7 +60,16 @@
     <Compile Include="Data\PermData.cs" />
     <Compile Include="Data\PermToFunc.cs" />
     <Compile Include="Data\RoleData.cs" />
+    <Compile Include="Data\RoleToPerm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IDataService.cs" />
+    <Compile Include="Services\DataOperation.cs" />
+    <Compile Include="Services\PageDataService.cs" />
+    <Compile Include="Services\ModelDataService.cs" />
+    <Compile Include="Services\RoleToPermService.cs" />
+    <Compile Include="Services\RoleDataService.cs" />
+    <Compile Include="Services\PermDataService.cs" />
+    <Compile Include="Services\PermToFuncService.cs" />
     <Compile Include="Services\MenuDataService.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -65,6 +79,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -76,7 +91,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Document\table.sql" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Danny.Lib\Danny.Lib.csproj">
       <Project>{c7698b2d-0b92-480d-a56a-dc27bba51040}</Project>

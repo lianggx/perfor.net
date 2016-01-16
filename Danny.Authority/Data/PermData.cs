@@ -18,5 +18,9 @@ namespace Danny.Authority.Data
          * @ 类型名称
          * */
         public string Name { get; set; }
+        /**
+         * @ 描述/备注
+         * */
+        public string Description { get; set; }
     }
 }

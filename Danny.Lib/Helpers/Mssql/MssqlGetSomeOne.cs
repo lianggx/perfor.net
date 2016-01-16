@@ -12,15 +12,15 @@ using System.Text;
 namespace Danny.Lib.Helpers.Mssql
 {
     /**
-     * @ 分页查询
+     * @ 获取一些行，这个类是一个奇葩的存在，暂未重构
      * */
-    public partial class MssqlReadPager : SQLHelper
+    public partial class MssqlGetSomeOne : SQLHelper
     {
         #region Identity
         /**
- * @ 默认构造函数
- * */
-        public MssqlReadPager()
+         * @ 默认构造函数
+         * */
+        public MssqlGetSomeOne()
             : base()
         {
             InitializeComponent(null);
@@ -30,7 +30,7 @@ namespace Danny.Lib.Helpers.Mssql
          *  @ 构造函数第一次重载
          *  @ tableName ：要插入的表名
          * */
-        public MssqlReadPager(string tableName)
+        public MssqlGetSomeOne(string tableName)
             : this(tableName, "")
         {
         }
@@ -39,7 +39,7 @@ namespace Danny.Lib.Helpers.Mssql
          *  @ 构造函数第一次重载
          *  @ tableName ：要插入的表名
          * */
-        public MssqlReadPager(string tableName, string sqlCmdText)
+        public MssqlGetSomeOne(string tableName, string sqlCmdText)
         {
             InitializeComponent(tableName, sqlCmdText);
         }
@@ -49,7 +49,7 @@ namespace Danny.Lib.Helpers.Mssql
          *  @ tableName ：要插入的表名
          *  @ context 数据库上下文对象
          * */
-        public MssqlReadPager(string tableName, SQLContext context)
+        public MssqlGetSomeOne(string tableName, SQLContext context)
             : base(context)
         {
             InitializeComponent(tableName);
@@ -60,7 +60,7 @@ namespace Danny.Lib.Helpers.Mssql
          *  @ tableName ：要插入的表名
          *  @ context 数据库上下文对象
          * */
-        public MssqlReadPager(string tableName, SQLContext context, string sqlCmdText)
+        public MssqlGetSomeOne(string tableName, SQLContext context, string sqlCmdText)
             : base(context)
         {
             InitializeComponent(tableName, sqlCmdText);
@@ -80,24 +80,20 @@ namespace Danny.Lib.Helpers.Mssql
          * @ 查询数据集，该方法仅支持对单表进行封装
          * @ 注意：如果是进行多表连接查询，不管查询的字段多少，都以T类型为标准
          * @ 如果希望返回多表查询的完整字段，请考虑使用 Select 非泛型方法
-         * @ page 页码
-         * @ size 页大小
          * */
-        public List<T> Select<T>(int page, int size, out int rowCount) where T : class,new()
+        public List<T> Select<T>() where T : class,new()
         {
-            rowCount = 0;
-            List<T> dataList = new List<T>(size);
+            List<T> dataList = new List<T>();
             // 检查是否设置了主键            
             Type type = typeof(T);
             PropertyInfo[] piArray = type.GetProperties();
-
             string[] fields = new string[piArray.Length];
             for (int i = 0; i < piArray.Length; i++)
             {
                 fields[i] = piArray[i].Name;
             }
 
-            dataList = Select<T>(fields, "", page, size, out rowCount);
+            dataList = Select<T>(fields, "");
 
             return dataList;
         }
@@ -109,13 +105,10 @@ namespace Danny.Lib.Helpers.Mssql
          * @ primaryKey 表的主键
          * @ fields 要查询的字段名称
          * @ leftJoin 连接查询的语句
-         * @ page 页码
-         * @ size 页大小
          * */
-        public List<T> Select<T>(IEnumerable<string> fields, string leftJoin, int page, int size, out int rowCount) where T : class,new()
+        public List<T> Select<T>(IEnumerable<string> fields, string leftJoin) where T : class,new()
         {
-            rowCount = 0;
-            List<T> dataList = new List<T>(size);
+            List<T> dataList = new List<T>();
             try
             {
                 Type type = typeof(T);
@@ -124,10 +117,9 @@ namespace Danny.Lib.Helpers.Mssql
                     TableName = type.Name;
                 }
 
-                DbDataReader reader = DoReader(fields, leftJoin, page, size);
+                DbDataReader reader = DoReader(fields, leftJoin);
                 if (reader == null)
-                    return null;
-
+                    return dataList;
                 int len = fields.Count();
                 List<string> queryName = new List<string>();
                 for (int i = 0; i < len; i++)
@@ -137,15 +129,16 @@ namespace Danny.Lib.Helpers.Mssql
 
                 PropertyInfo[] pis = type.GetProperties();
                 reader.Read();
-                rowCount = reader["DataCount"].ObjToInt();
                 do
                 {
                     T result = new T();
+
                     for (int i = 0; i < pis.Length; i++)
                     {
                         PropertyInfo pi = pis[i];
                         if (queryName.Contains<string>(pi.Name.ToLower()) == false)
                             continue;
+
                         object rValue = reader[pi.Name];
                         if (rValue != null)
                             pi.SetValue(result, rValue, null);
@@ -166,21 +159,16 @@ namespace Danny.Lib.Helpers.Mssql
          * @ primaryKey 查询主表的主键字段名称
          * @ fields 要查询的字段名称
          * @ leftJoin 左连接查询语句
-         * @ page 页码
-         * @ size 页大小
          * */
-        public List<SQLDataResult> Select(IEnumerable<string> fields, string leftJoin, int page, int size, out int rowCount)
+        public List<SQLDataResult> Select(IEnumerable<string> fields, string leftJoin)
         {
-            rowCount = 0;
             List<SQLDataResult> list = new List<SQLDataResult>();
             try
             {
-                DbDataReader reader = DoReader(fields, leftJoin, page, size);
+                DbDataReader reader = DoReader(fields, leftJoin);
                 if (reader == null || reader.HasRows == false)
                     return list;
-
                 reader.Read();
-                rowCount = reader["DataCount"].ObjToInt();
                 do
                 {
                     SQLDataResult result = new SQLDataResult();
@@ -207,15 +195,11 @@ namespace Danny.Lib.Helpers.Mssql
          * @ primaryKey 查询主表的主键字段名称
          * @ fields 要查询的字段名称
          * @ leftJoin 左连接查询语句
-         * @ page 页码
-         * @ size 页大小
          * */
-        private DbDataReader DoReader(IEnumerable<string> fields, string leftJoin, int page, int size)
+        private DbDataReader DoReader(IEnumerable<string> fields, string leftJoin)
         {
             this.fields = fields;
             this.leftJoin = leftJoin;
-            this.pageIndex = page;
-            this.pageSize = size;
             if (InitSQLWithCmdText() == false)
                 return null;
 
@@ -243,46 +227,13 @@ namespace Danny.Lib.Helpers.Mssql
             if (fields.IsNullOrEmpty())
                 throw new ArgumentNullException("必须设置要查询的字段fields");
 
-            if (primaryKey.IsNullOrEmpty())
-                throw new ArgumentNullException("必须设置属性PrimaryKey的值为查询主表的主键名称");
-
-            if (pageSize < 1)
-                throw new ArgumentNullException("必须设置属性pageSize的值，且该值必须大于0");
-
-            if (orderBy.IsNullOrEmpty())
-                throw new ArgumentNullException("必须调用SetOrderBy方法进行设置排序字段");
-
             string alias = string.Empty;
-            string pk = string.Empty;
             if (tableAlias.IsNotNull())
             {
                 alias = string.Format("AS {0}", tableAlias);
-                pk = string.Format("{0}.{1}", tableAlias, primaryKey);
-            }
-            else
-            {
-                pk = primaryKey;
             }
             string whereString = GetCondition();
-            string tempTableName = string.Format("{0}{1}", "A", Guid.NewGuid().ToString("N"));
-            // 如果没有条件，对全表进行统计行数
-            string sysSql = string.Format(@"dbcc updateusage(0,{0}) with no_infomsgs
-SELECT @DataCount =SUM (CASE WHEN (index_id < 2) THEN row_count ELSE 0 END) FROM sys.dm_db_partition_stats
- WHERE object_id = object_id('{0}')", TableName);
-            // 按条件查询
-            string mSql = string.Format(@"SELECT @DataCount=COUNT(1) FROM {0} {1} {2} {3}", TableName, alias, leftJoin, whereString);
-            SQLCmdText = string.Format(@"DECLARE @DataCount int
-{13}
-        SELECT {0},@DataCount as DataCount FROM {1} {2} 
-            {3} 
-            WHERE {12} IN 
-            (
-                SELECT {4} FROM 
-                    (
-                        SELECT TOP {9} {12},ROW_NUMBER() OVER({5}) AS R_NO FROM {1} {2} {3} {6} {5}
-                    ){11} WHERE R_NO BETWEEN {8} AND {10}
-            ) {7} {5}", fields.ToJoin(), TableName, alias, leftJoin, primaryKey, orderBy, whereString, groupBy, pageIndex, pageSize, pageIndex * pageSize, tempTableName, pk, whereString.IsNullOrEmpty() ? sysSql : mSql);
-
+            SQLCmdText = string.Format(@"SELECT {0} FROM {1} {2} {3} {4} {5} {6}", fields.ToJoin(), TableName, alias, leftJoin, whereString, orderBy, groupBy);
 
             Succeed = true;
             return Succeed;
@@ -408,42 +359,6 @@ SELECT @DataCount =SUM (CASE WHEN (index_id < 2) THEN row_count ELSE 0 END) FROM
         {
             get { return orderBy; }
             set { orderBy = value; }
-        }
-
-        private string primaryKey = string.Empty;
-        /**
-         * @ 主表的主键
-         * */
-        public string PrimaryKey
-        {
-            get { return primaryKey; }
-            set { primaryKey = value; }
-        }
-
-        /**
-         * @ 页码
-         * */
-        private int pageIndex = 0;
-        public int PageIndex
-        {
-            get
-            {
-                if (pageIndex < 1)
-                    pageIndex = 0;
-                else
-                    pageIndex--;
-                return pageIndex;
-            }
-            set { pageIndex = value; }
-        }
-        /**
-         * @ 页大小
-         * */
-        private int pageSize = 0;
-        public int PageSize
-        {
-            get { return pageSize; }
-            set { pageSize = value; }
         }
         #endregion
     }

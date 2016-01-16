@@ -45,7 +45,7 @@ namespace Danny.Lib.Extension
          * */
         public static bool IsNotNull(this string str)
         {
-            bool isNotNull = str.IsNullOrEmpty() == false;
+            bool isNotNull = string.IsNullOrEmpty(str) == false;
             return isNotNull;
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Danny.Lib.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace Danny.Authority.Data
         /**
          * @ 文件编号，主键
          * */
+        [SQLEntityKey(PrimaryKey = true)]
         public string ID { get; set; }
         /**
          * @ 文件名称
@@ -22,5 +24,9 @@ namespace Danny.Authority.Data
          * @ 文件路径
          * */
         public string Url { get; set; }
+        /**
+         * @ 排序号
+         * */
+        public int Sort { get; set; }
     }
 }

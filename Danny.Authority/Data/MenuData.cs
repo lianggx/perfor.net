@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Danny.Lib.Helpers;
 
 namespace Danny.Authority.Data
 {
@@ -17,6 +18,7 @@ namespace Danny.Authority.Data
         /**
          * @ 菜单ID
          * */
+        [SQLEntityKey(PrimaryKey = true)]
         public string ID { get; set; }
         /**
          * @ 菜单名称
@@ -30,5 +32,13 @@ namespace Danny.Authority.Data
          * @ 菜单URL
          * */
         public string Url { get; set; }
+        /**
+         * @ 层级
+         * */
+        public int Level { get; set; }
+        /**
+         * @ 排序号
+         * */
+        public int Sort { get; set; }
     }
 }

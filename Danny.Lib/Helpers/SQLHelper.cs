@@ -101,13 +101,13 @@ namespace Danny.Lib.Helpers
           * @ values 字段对应的值 
          *  @ primaryKeyIndex 实体键在fields参数列表中的索引
           * */
-        protected SQLParameter AddObject(string[] fields, object[] values, int primaryKeyIndex = -1)
+        protected SQLParameter AddObject(IEnumerable<string> fields, IEnumerable<object> values, int primaryKeyIndex = -1)
         {
-            if (fields == null || fields.Length == 0)
+            if (fields.IsNullOrEmpty())
                 throw new ArgumentNullException("fields 参数不能为空");
-            if (values == null || values.Length == 0)
+            if (values.IsNullOrEmpty())
                 throw new ArgumentNullException("values 参数不能为空");
-            if (fields.Length != values.Length)
+            if (fields.Count() != values.Count())
                 throw new ArgumentException("字段名称和值的数量必须一致");
             if (primaryKeyIndex == -1)
                 throw new ArgumentException("必须指定参数primaryKeyIndex的值");
@@ -141,8 +141,8 @@ namespace Danny.Lib.Helpers
 
             int pkCount = 0;
             SQLParameter par = new SQLParameter();
-            string[] fields = new string[len];
-            object[] values = new object[len];
+            List<string> fields = new List<string>(len);
+            List<object> values = new List<object>(len);
             for (int i = 0; i < len; i++)
             {
                 PropertyInfo pi = piArray[i];
@@ -161,12 +161,12 @@ namespace Danny.Lib.Helpers
                 {
                     throw new ArgumentException("必须对实体类进行实体键 LdfSQLEntityKey 的配置，且只能出现一次，请勿使用复合主键");
                 }
-                fields[i] = pi.Name;
-                values[i] = pi.GetValue(obj, null);
+                fields.Add(pi.Name);
+                values.Add(pi.GetValue(obj, null));
             }
             par.Fields = fields;
             par.Values = values;
-            parameters.Add(par);
+            Parameters.Add(par);
 
 
             return Succeed;
@@ -206,6 +206,109 @@ namespace Danny.Lib.Helpers
             this.tablename = tableName;
         }
 
+        #region AddWhere
+        /**
+         * @ 给条件列表增加一个左括号（
+         * */
+        public void AddBracketLeft()
+        {
+            Conditions.Add(new BracketLeft());
+        }
+
+        /**
+         * @ 给条件列表增加一个右括号）
+         * */
+        public void AddBracketRight()
+        {
+            Conditions.Add(new BracketRight());
+        }
+
+        /**
+         * @ 增加一个条件
+         * @ field 字段名称
+         * @ value 值，支持空值
+         * */
+        public void AddWhere(string field, object value)
+        {
+            AddWhere(field, SQLExpression.ExprOperator.Eq, value);
+        }
+
+        /**
+        * @ 增加一个条件
+        * @ field 字段名称
+        * @ expr 运算符
+        * @ value 值，支持空值
+        * */
+        public void AddWhere(string field, SQLExpression.ExprOperator expr, object value)
+        {
+            SQLCondition lsc = new SQLCondition(field, value, expr);
+            Conditions.Add(lsc);
+        }
+
+        /**
+      * @ 增加一个条件
+      * @ field 字段名称
+      * @ expr 运算符
+      * @ value 值，支持空值
+      * @ joinType 连接上一个条件的运算位
+      * */
+        public void AddWhere(string field, SQLExpression.ExprOperator expr, object value, SQLExpression.JoinType joinType)
+        {
+            Conditions.Add(new SQLCondition(field, value, expr, joinType));
+        }
+
+        /**
+         * @ 获取条件列表的表现形式
+         * */
+        protected string GetCondition()
+        {
+            if (Conditions.Count == 0)
+                return "";
+
+            StringBuilder whereString = new StringBuilder();
+            for (int i = 0; i < Conditions.Count; i++)
+            {
+                var item = Conditions[i];
+                if (item.GetType() == typeof(SQLCondition))
+                {
+                    whereString.Append(GetCondition(i, item));
+                }
+                else if (item.GetType() == typeof(BracketLeft))
+                {
+
+                    if (i + 1 == Conditions.Count)
+                    {
+                        throw new ArgumentException("最后一个参数不能是左括号（");
+                    }
+                    i++;
+                    item = Conditions[i];
+                    // 因为是第一个括号连接条件，不需要连接符号，所以第一个参数传递0
+                    string leftWhere = string.Format("{0} ({1}", item.JoinType.GetEnumString(), GetCondition(0, item));
+                    whereString.Append(leftWhere);
+                }
+                else if (item.GetType() == typeof(BracketRight))
+                {
+                    whereString.Append(")");
+                }
+            }
+
+            string ws = string.Format("WHERE {0}", whereString.ToString().ToTrimSpace());
+
+            return ws;
+        }
+
+        protected string GetCondition(int index, SQLCondition item)
+        {
+            string jt = index == 0 ? "" : item.JoinType.GetEnumString();
+            // 构造参数化形式
+            DbParameter par = AddParameter(item.Name, item.Value);
+            if ((item.Expression & (SQLExpression.ExprOperator.Like | SQLExpression.ExprOperator.NotLike)) == item.Expression)
+                return string.Format("{0} {1} {2} '%{3}%' ", jt, item.Name, item.Expression.GetEnumString(), par.ParameterName);
+            else
+                return string.Format("{0} {1} {2} {3} ", jt, item.Name, item.Expression.GetEnumString(), par.ParameterName);
+        }
+        #endregion
+
         #region 参数设置
         /**
          * @ 添加泛型参数
@@ -228,7 +331,7 @@ namespace Danny.Lib.Helpers
             DbParameter dp = context.GetDbParameter();
             if (name.IndexOf('@') < 0)
             {
-                name = string.Format("@{0}{1}", name, Guid.NewGuid().ToString("N"));
+                name = string.Format("@{0}_{1}", name.Trim(), Guid.NewGuid().ToString("N"));
             }
             dp.ParameterName = name;
             if (value == null)
@@ -355,7 +458,7 @@ namespace Danny.Lib.Helpers
         {
             get
             {
-                sqlCmdText = Utilities.DetectSQLInjection(sqlCmdText);
+                //sqlCmdText = Utilities.DetectSQLInjection(sqlCmdText);
                 return sqlCmdText;
             }
             set { sqlCmdText = value; }
@@ -395,12 +498,28 @@ namespace Danny.Lib.Helpers
         {
             get
             {
-                if (Parameters == null)
+                if (parameters == null)
                     parameters = new List<SQLParameter>();
-                return Parameters;
+
+                return parameters;
             }
         }
-        #endregion
 
+        private List<SQLCondition> condition = null;
+        /**
+         * @ WHERE参数列表
+         * */
+        public List<SQLCondition> Conditions
+        {
+            get
+            {
+                if (condition == null)
+                    condition = new List<SQLCondition>();
+
+                return condition;
+            }
+            set { condition = value; }
+        }
+        #endregion
     }
 }
