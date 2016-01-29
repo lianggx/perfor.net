@@ -413,6 +413,7 @@ namespace Danny.Lib.Extension
         {
             return DateAndTime.DateDiff(di, dt1, dt2);
         }
+
         public static long ToUnixDateTime(this DateTime dt)
         {
             long val = 0;

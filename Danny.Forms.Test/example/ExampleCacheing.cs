@@ -14,10 +14,10 @@ namespace Danny.Forms.Test.example
     public partial class ExampleCacheing
     {
         private ObjectCache memoryCache = GLCacheExpiration.Cache;
-        private string dbConnectionString = "Server=.;Database=tempdb;User ID=sa;Password=123456;Trusted_Connection=True";
+        private string dbConnectionString = "Server=.;Database=testdb;User ID=sa;Password=123456;Trusted_Connection=True";
 
         ObjectCache cache = MemoryCache.Default;
-        private void MainTest(object sender, EventArgs e)
+        public void MainTest()
         {
             // SQLTestSingle();
             // SQLTestList();
@@ -36,7 +36,7 @@ namespace Danny.Forms.Test.example
             if (memoryCache[ckey] == null)
             {
                 CacheItem item = LoadSQLDataScalar();
-                cusGender = (bool)item.Value;
+                cusGender = Convert.ToBoolean(item.Value);
             }
             else
             {
@@ -50,7 +50,7 @@ namespace Danny.Forms.Test.example
         {
             Console.WriteLine("From SQL");
             DateTimeOffset dtOffset = new DateTimeOffset(DateTime.Now.AddHours(3));
-            string sqlCmd = "SELECT Gender FROM dbo.Customer  WHERE ID='B0AA40CF8B604F64AE57E55384A455E3'";
+            string sqlCmd = "SELECT Gender FROM dbo.Customers  WHERE ID='00000ddb92044fad8be0913b68697318'";
             CacheItem cacheItem = GLCacheExpiration.CreateSQLCache("cus", dbConnectionString, sqlCmd, dtOffset, onScalarSourceChange);
 
             return cacheItem;

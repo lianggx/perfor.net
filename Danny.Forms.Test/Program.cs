@@ -1,32 +1,22 @@
-﻿using Danny.Lib.Cacheing;
+﻿using Danny.Authority.Services;
 using Danny.Forms.Test.example;
-using Danny.Lib.Xml.PListXml;
+using Danny.Lib.Cacheing;
+using Danny.Lib.Common;
 using Danny.Lib.Enums;
 using Danny.Lib.Extension;
 using Danny.Lib.Helpers;
-using Danny.Lib.Logs;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
-
+using Danny.Lib.Helpers.Mssql;
+using Danny.Lib.Web;
+using Danny.Lib.Xml;
+using Danny.Lib.Xml.PListXml;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Windows.Forms;
-using System.Xml;
-using Danny.Lib.Web;
-using Danny.Lib.Common;
-using Danny.Lib.Helpers.Mssql;
-using Danny.Lib.Xml;
-using Danny.Authority.Services;
-using Danny.Authority.Data;
 
 namespace Danny.Forms.Test
 {
@@ -39,8 +29,15 @@ namespace Danny.Forms.Test
         static void Main()
         {
             //string id = Guid.NewGuid().ToString("N");
-
-            TestMenuData();
+            //DateTime d = DateTime.Now;
+            //Console.WriteLine(d.ToUnixDateTime()*0.001);
+            //DLWebHelper dlRequest = new DLWebHelper();
+            //HttpWebRequest request = dlRequest.Create("http://www.baidu.com", ActionType.GET);
+            //DLResponseData data = dlRequest.GetResponse(request, true, true);
+            //string str = "4X11J15R3AARM5Y6JW6V";
+            //byte[] bytes = str.FromBase64();
+            //string method = ActionType.GET.ToString();
+            //str = Encoding.UTF8.GetString(bytes);
             Console.WriteLine("succeed");
             Console.ReadKey();
 
@@ -52,7 +49,7 @@ namespace Danny.Forms.Test
         #region Mssql Test
         static void TestParams()
         {
-            WebParams wp = new WebParams();
+            DLWebParams wp = new DLWebParams();
             int count = wp["count1"].ToInt();
             Console.WriteLine(count);
         }
@@ -354,7 +351,7 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             //array.Add(new PermToFunc() { DataType = FuncDataType.Menu, Perm_ID = "32b4f86b3430417ba58d9ed799c46ee6", Func_ID = "3872485a5814485fb1f9761a25c0b034" });
             //array.Add(new PermToFunc() { DataType = FuncDataType.Menu, Perm_ID = "882911388ca9447096c9fcecc7c8cde9", Func_ID = "" });
             //menudata.Add(array);
-             List<SQLDataResult> list = menudata.GetMeumByPermId("259ee1d5ff414b01a9f1ba378981f9b1");
+            List<SQLDataResult> list = menudata.GetMeumByPermId("259ee1d5ff414b01a9f1ba378981f9b1");
 
             Console.WriteLine("");
 

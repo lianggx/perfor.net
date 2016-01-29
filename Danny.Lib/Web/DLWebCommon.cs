@@ -12,7 +12,7 @@ namespace Danny.Lib.Web
     /**
      * @ Web公共函数处理
      * */
-    public partial class WebCommon
+    public partial class DLWebCommon
     {
         #region XSS.To
 

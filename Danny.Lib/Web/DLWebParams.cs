@@ -14,13 +14,13 @@ namespace Danny.Lib.Web
      * @ 创建 Web参数包装对象
      * */
     [Serializable]
-    public class WebParams : Dictionary<string, object>, IDisposable
+    public class DLWebParams : Dictionary<string, object>, IDisposable
     {
         #region Identity
         /***
          * @ 析构函数，清理托管资源
          * */
-        ~WebParams()
+        ~DLWebParams()
         {
             Dispose(false);
         }
@@ -28,13 +28,13 @@ namespace Danny.Lib.Web
         /**
          * @ 序列化参数构造函数
          * */
-        protected WebParams(SerializationInfo info, StreamingContext contex)
+        protected DLWebParams(SerializationInfo info, StreamingContext contex)
             : base(info, contex) { }
 
         /**
          * @ 默认构造函数
          * */
-        public WebParams()
+        public DLWebParams()
         {
             InitParams();
         }
