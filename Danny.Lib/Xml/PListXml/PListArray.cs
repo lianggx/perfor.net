@@ -8,28 +8,28 @@ using System.Xml.Linq;
 
 using Danny.Lib.Extension;
 using Danny.Lib.Common;
+using System.Collections;
 
 namespace Danny.Lib.Xml.PListXml
 {
-    public partial class PListArray : List<IPListNode>, IPListNode
+    /**
+     * @ plist格式的 array 包装类
+     * */
+    public partial class PListArray : PListCollection, IList<IPListNode>
     {
         #region Identity
-        ~PListArray()
-        {
-            Dispose(false);
-        }
-
-        public PListArray() { }
+        private List<IPListNode> properties = new List<IPListNode>();
         #endregion
 
+        #region Self
         /**
          * @ 实现 IPListNode 接口
          * */
-        public void WriterXml(XmlWriter writer)
+        public override void WriterXml(XmlWriter writer)
         {
-            foreach (var item in this)
+            foreach (var item in properties)
             {
-                NodeValueType lvt = PListFactory.GetValueType(item.Value);
+                NodeValueType lvt = GetValueType(item.Value);
                 string keyName = lvt.ToString().ToLower();
 
                 if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
@@ -40,43 +40,43 @@ namespace Danny.Lib.Xml.PListXml
                     writer.WriteEndElement();
                 }
                 else
-                    PListFactory.FormatXml(writer, item);
+                    FormatXml(writer, item);
             }
         }
 
         /**
          * @ 实现 IPListNode 接口
          * */
-        public void ReaderXml(XElement reader)
+        public override void ReaderXml(XElement reader)
         {
             if (reader.IsEmpty)
                 return;
-            this.tag = reader.Name.LocalName;
+            this.Tag = reader.Name.LocalName;
             IEnumerable<XNode> ns = reader.Nodes();
             foreach (var item in ns)
             {
                 XElement node = (XElement)item;
                 if (node == null)
                     continue;
-                IPListNode val = PListFactory.ParseNode(node);
+                IPListNode val = ParseNode(node);
                 val.Tag = node.Name.LocalName;
-                val.Order = this.Count;
-                base.Add(val);
-                this.Value = val;
+                val.Order = Count;
+                properties.Add(val);
+                this.htValue = val;
             }
         }
 
         /**
           * @ 将IPListNode对象转换为JSON字符串
           * */
-        public void WriterJson(TextWriter writer)
+        public override void WriterJson(TextWriter writer)
         {
             writer.Write(Utilities.JSON_BRACKET_LEFT);
-            int len = this.Count();
+            int len = Count;
             for (int i = 0; i < len; i++)
             {
                 var item = this[i];
-                NodeValueType lvt = PListFactory.GetValueType(item.Value);
+                NodeValueType lvt = GetValueType(item.Value);
                 string keyName = lvt.ToString().ToLower();
 
                 if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
@@ -88,7 +88,7 @@ namespace Danny.Lib.Xml.PListXml
                 }
                 else
                 {
-                    PListFactory.FormatJson(writer, "", item);
+                    FormatJson(writer, "", item);
                     string comma = Utilities.IsWriterComma(len, i, 1);
                     writer.Write(comma);
                 }
@@ -97,90 +97,114 @@ namespace Danny.Lib.Xml.PListXml
         }
 
         /**
-         * @ 将 LdfHashtable 转换成JSON字符串
-         * */
-        public string ToJson()
-        {
-            string result = string.Empty;
-            using (MemoryStream ms = new MemoryStream())
-            {
-                TextWriter writer = new StreamWriter(ms);
-                WriterJson(writer);
-                writer.Flush();
-                result = Encoding.UTF8.GetString(ms.ToArray());
-            }
-
-            return result;
-        }
-
-        /**
          * @ 将JSON转换为IPListNode对象
          * */
-        public void ReaderJson(TextReader reader)
+        public override void ReaderJson(TextReader reader)
         {
         }
 
-        /**
-         * @ 接口实现，清理资源
-         * */
-        public void Dispose()
+        public override bool HasChildren
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            get { return properties.Count > 0; }
+        }
+        #endregion
+
+        #region IList
+        public int IndexOf(IPListNode item)
+        {
+            return properties.IndexOf(item);
         }
 
+        public void Insert(int index, IPListNode item)
+        {
+            properties.Insert(index, item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            properties.RemoveAt(index);
+        }
+
+        public IPListNode this[int index]
+        {
+            get
+            {
+                return properties[index];
+            }
+            set { this.Insert(index, value); }
+        }
+
+        public override IPListNode this[string key]
+        {
+            get
+            {
+                IPListNode node = properties.FirstOrDefault(f => f.Tag == key);
+                return node;
+            }
+            set
+            {
+                IPListNode node = properties.FirstOrDefault(f => f.Tag == key);
+                node.Value = value;
+            }
+        }
+
+        public void Add(IPListNode item)
+        {
+            properties.Add(item);
+        }
+
+        public void Clear()
+        {
+            properties.Clear();
+        }
+
+        public bool Contains(IPListNode item)
+        {
+            return properties.Contains(item);
+        }
+
+        public void CopyTo(IPListNode[] array, int arrayIndex)
+        {
+            properties.CopyTo(array, arrayIndex);
+        }
+
+        public int Count
+        {
+            get { return properties.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        public bool Remove(IPListNode item)
+        {
+            return properties.Remove(item);
+        }
+
+        public IEnumerator<IPListNode> GetEnumerator()
+        {
+            return properties.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return properties.GetEnumerator();
+        }
+        #endregion
+
+        #region IPListNode
         /**
          * @ 清理托管资源
          * */
-        private void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
                 return;
 
-            this.Clear();
+            Clear();
             disposing = true;
-        }
-
-        #region Properties
-        private string tag = string.Empty;
-        /**
-         * @ 标签名称
-         * */
-        public string Tag
-        {
-            get { return tag; }
-            set { tag = value; }
-        }
-        private int order = 0;
-        /**
-         * @ 排序号
-         * */
-        public int Order
-        {
-            get { return order; }
-            set { order = value; }
-        }
-
-
-        private object htValue = string.Empty;
-        /**
-         * @ 包装的值
-         * */
-        public Object Value
-        {
-            get { return this; }
-            set { htValue = value; }
-        }
-
-        /**
-         * @ 实现 IPListNode 接口
-         * */
-        public bool HasChildren
-        {
-            get
-            {
-                return this.Count > 0;
-            }
         }
         #endregion
     }

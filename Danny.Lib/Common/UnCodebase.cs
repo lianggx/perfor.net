@@ -11,9 +11,13 @@ using System.Text;
 
 namespace Danny.Lib.Common
 {
-    public class UnCodebase
+    public class UnCodebase : IDisposable
     {
         public Bitmap bmpobj;
+        ~UnCodebase()
+        {
+            Dispose(false);
+        }
 
         public UnCodebase(Bitmap pic)
         {
@@ -231,6 +235,23 @@ namespace Danny.Lib.Common
                         code = code + "0";
                 }
             return code;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool dispose)
+        {
+            if (dispose)
+                return;
+
+            if (bmpobj != null)
+            {
+                bmpobj.Dispose();
+            }
         }
     }
 }

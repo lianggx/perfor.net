@@ -110,6 +110,7 @@
     <Compile Include="Web\WebParams.cs" />
     <Compile Include="Xml\PListXml\IPListNode.cs" />
     <Compile Include="Xml\PListXml\PListArray.cs" />
+    <Compile Include="Xml\PListXml\PListCollection.cs" />
     <Compile Include="Xml\PListXml\PListDict.cs" />
     <Compile Include="Xml\PListXml\NodeValueType.cs" />
     <Compile Include="Xml\PListXml\PListFactory.cs" />

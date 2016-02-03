@@ -273,11 +273,12 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             ht4["ht3"] = ht3;
             array.Add(ht4);
             ht["array"] = array;
-            string result = ht.ToPListString();
+            string result = ht.ToXmlString();
             PListDict node = new PListDict();
-            node.FromString(result);
+            node.FromXmlString(result);
             string nodestr = node.ToJson();
             string arrayJson = array.ToJson();
+
             Console.WriteLine(nodestr);
 
         }
@@ -285,24 +286,23 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
         static void TestPListParse()
         {
             PListDict dict = new PListDict();
-            dict.FromFile("新建文本文档.txt");
+            dict.FromXmlFile("新建文本文档.txt");
 
-            string result = dict.ToPListString();
+            string result = dict.ToXmlString();
             Console.WriteLine(result);
         }
 
         static void TestNormalXml()
         {
             XmlDict xd = new XmlDict();
-            xd.Load("XMLFile1.xml");
-
-            string v1 = xd["recipename"].Value.ToString();
-            XmlDict l3 = xd["ingredlist"]["listitem 3"];
-            string v2 = l3.ToXml();
-            Console.WriteLine("{0},{1},{2}", l3.Tag, l3.Order, l3.Value);
-
-            Console.WriteLine(v1);
-            Console.WriteLine(v2);
+            xd.Load("ms-persist.xml");
+            //string v1 = xd["recipename"].Value.ToString();
+            //IPListNode l3 = xd["ingredlist"]["listitem 3"];
+            //string v2 = l3.ToXmlString();
+            //Console.WriteLine("{0},{1},{2}", l3.Tag, l3.Order, l3.Value);
+            int count = xd.Items.Count;
+            //Console.WriteLine(v1);
+            Console.WriteLine(count);
         }
         #endregion
 
