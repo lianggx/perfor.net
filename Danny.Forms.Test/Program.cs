@@ -278,7 +278,7 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             node.FromXmlString(result);
             string nodestr = node.ToJson();
             string arrayJson = array.ToJson();
-
+            Console.WriteLine(result);
             Console.WriteLine(nodestr);
 
         }

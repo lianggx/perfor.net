@@ -80,7 +80,7 @@ namespace Danny.Lib.Xml.PListXml
                 if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
                 {
                     writer.WriteStartElement(keyName);
-                    ((PListCollection)objValue).WriterXml(writer);
+                    ((IPListNode)objValue).WriterXml(writer);
                     writer.WriteEndElement();
                 }
                 else
