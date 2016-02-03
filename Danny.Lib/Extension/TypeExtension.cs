@@ -233,6 +233,7 @@ namespace Danny.Lib.Extension
 
         #endregion
 
+        
         #region String.To
         public static string ToNorString(this Guid value)
         {

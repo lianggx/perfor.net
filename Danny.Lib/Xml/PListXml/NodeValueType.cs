@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Danny.Lib.Xml.PListXml
 {
-    public enum LdfValueType
+    public enum NodeValueType
     {
         DICT = 10,
         ARRAY = 20,

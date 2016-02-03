@@ -11,12 +11,12 @@ namespace Danny.Lib.Xml
     /**
      * @ xml 序列化类
      * */
-    public sealed class LdfXmlConverter
+    public sealed class XmlParser
     {
         /**
          * @ 私有构造函数，成员都是 static ，无需初始化
          * */
-        private LdfXmlConverter()
+        private XmlParser()
         {
         }
 

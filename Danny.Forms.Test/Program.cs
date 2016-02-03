@@ -9,6 +9,7 @@ using Danny.Lib.Helpers.Mssql;
 using Danny.Lib.Web;
 using Danny.Lib.Xml;
 using Danny.Lib.Xml.PListXml;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,6 +39,9 @@ namespace Danny.Forms.Test
             //byte[] bytes = str.FromBase64();
             //string method = ActionType.GET.ToString();
             //str = Encoding.UTF8.GetString(bytes);
+
+
+            TestPList();
             Console.WriteLine("succeed");
             Console.ReadKey();
 
@@ -49,7 +53,7 @@ namespace Danny.Forms.Test
         #region Mssql Test
         static void TestParams()
         {
-            DLWebParams wp = new DLWebParams();
+            WebParams wp = new WebParams();
             int count = wp["count1"].ToInt();
             Console.WriteLine(count);
         }
@@ -265,11 +269,17 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             ht3["istrue"] = new PListDict(istrue);
             ht3["isfalse"] = new PListDict(isfalse);
 
-            array.Add(ht3);
+            PListDict ht4 = new PListDict();
+            ht4["ht3"] = ht3;
+            array.Add(ht4);
             ht["array"] = array;
             string result = ht.ToPListString();
             PListDict node = new PListDict();
             node.FromString(result);
+            string nodestr = node.ToJson();
+            string arrayJson = array.ToJson();
+            Console.WriteLine(nodestr);
+
         }
 
         static void TestPListParse()

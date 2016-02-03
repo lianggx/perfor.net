@@ -61,6 +61,7 @@ namespace Danny.Lib.Xml
             }
         }
 
+
         /**
          * @ 读取 xml 节点到字典
          * @ nodes xml节点集合
@@ -122,6 +123,20 @@ namespace Danny.Lib.Xml
                 writer.WriteEndElement();
             }
             writer.WriteEndElement();
+        }
+
+        /**
+          * @ 将IPListNode对象转换为JSON字符串
+          * */
+        public void WriterJson(TextWriter writer)
+        {
+        }
+
+        /**
+         * @ 将JSON转换为IPListNode对象
+         * */
+        public void ReaderJson(TextReader reader)
+        {
         }
 
         /**

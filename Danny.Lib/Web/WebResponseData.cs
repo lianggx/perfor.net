@@ -9,7 +9,7 @@ namespace Danny.Lib.Web
     /**
      * @ 响应数据
      * */
-    public class DLResponseData
+    public class WebResponseData
     {
         public Uri Url { get; set; }
         public string Html { get; set; }

@@ -8,6 +8,8 @@ using System.Xml.Linq;
 using Danny.Lib.Extension;
 using System.Xml;
 using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
+using Danny.Lib.Common;
 
 namespace Danny.Lib.Xml.PListXml
 {
@@ -22,6 +24,7 @@ namespace Danny.Lib.Xml.PListXml
         {
             Dispose(false);
         }
+
 
         /**
          * @ 默认构造方法
@@ -73,13 +76,13 @@ namespace Danny.Lib.Xml.PListXml
          * @ key 如果当前对象的值是 LdfHashtable 对象，则 key 应当为 hash key
          * @ 如果当前对象值类型为 IList，则自动将 key 转换成下标
          * */
-        public new IPListNode this[string key]
+        public IPListNode this[string key]
         {
             get
             {
                 IPListNode ht = null;
-                LdfValueType lvt = PListFactory.GetValueType(this.objValue);
-                if (lvt == LdfValueType.ARRAY && key.IsInt())
+                NodeValueType lvt = PListFactory.GetValueType(this.objValue);
+                if (lvt == NodeValueType.ARRAY && key.IsInt())
                 {
                     IList list = this.objValue as IList;
                     ht = list[key.ObjToInt()] as IPListNode;
@@ -149,6 +152,23 @@ namespace Danny.Lib.Xml.PListXml
         }
 
         /**
+         * @ 将 LdfHashtable 转换成JSON字符串
+         * */
+        public string ToJson()
+        {
+            string result = string.Empty;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                TextWriter writer = new StreamWriter(ms);
+                WriterJson(writer);
+                writer.Flush();
+                result = Encoding.UTF8.GetString(ms.ToArray());
+            }
+
+            return result;
+        }
+
+        /**
          * @ 将当前对象以 xml 形式写入 stream
          * @ stream 流对象
          * */
@@ -190,7 +210,7 @@ namespace Danny.Lib.Xml.PListXml
             foreach (var item in this)
             {
                 PListFactory.WriteElementKey(writer, item.Key);
-                LdfValueType lvt;
+                NodeValueType lvt;
                 bool hasChildren = item.Value.HasChildren;
                 object objValue = null;
                 if (hasChildren)
@@ -206,7 +226,7 @@ namespace Danny.Lib.Xml.PListXml
 
                 string keyName = lvt.ToString().ToLower();
 
-                if (lvt == (lvt & (LdfValueType.DICT | LdfValueType.ARRAY)))
+                if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
                 {
                     writer.WriteStartElement(keyName);
                     ((IPListNode)objValue).WriterXml(writer);
@@ -240,6 +260,54 @@ namespace Danny.Lib.Xml.PListXml
                 this.Add(n.Value, val);
                 this.Value = val;
             }
+        }
+
+        /**
+         * @ 将IPListNode对象转换为JSON字符串
+         * */
+        public void WriterJson(TextWriter writer)
+        {
+            writer.Write(Utilities.JSON_BRACES_LEFT);
+            int len = this.Keys.Count;
+            int index = 0;
+            foreach (var item in this)
+            {
+                NodeValueType lvt;
+                bool hasChildren = item.Value.HasChildren;
+                object objValue = null;
+                if (hasChildren)
+                {
+                    lvt = PListFactory.GetValueType(item.Value);
+                    objValue = item.Value;
+                }
+                else
+                {
+                    lvt = PListFactory.GetValueType(item.Value.Value);
+                    objValue = item.Value.Value;
+                }
+                if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
+                {
+                    writer.Write(string.Format("{0}{1}{0}{2}", Utilities.JSON_QUOTES, item.Key, Utilities.JSON_COLON));
+                    ((IPListNode)objValue).WriterJson(writer);
+                    string comma = Utilities.IsWriterComma(len, index, 1);
+                    writer.Write(comma);
+                }
+                else
+                {
+                    PListFactory.FormatJson(writer, item.Key, item.Value);
+                    string comma = Utilities.IsWriterComma(len, index, 1);
+                    writer.Write(comma);
+                }
+                index++;
+            }
+            writer.Write(Utilities.JSON_BRACES_RIGHT);
+        }
+
+        /**
+         * @ 将JSON转换为IPListNode对象
+         * */
+        public void ReaderJson(TextReader reader)
+        {
         }
 
         /**

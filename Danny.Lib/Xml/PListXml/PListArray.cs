@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+
+using Danny.Lib.Extension;
+using Danny.Lib.Common;
 
 namespace Danny.Lib.Xml.PListXml
 {
@@ -25,10 +29,10 @@ namespace Danny.Lib.Xml.PListXml
         {
             foreach (var item in this)
             {
-                LdfValueType lvt = PListFactory.GetValueType(item.Value);
+                NodeValueType lvt = PListFactory.GetValueType(item.Value);
                 string keyName = lvt.ToString().ToLower();
 
-                if (lvt == (lvt & (LdfValueType.DICT | LdfValueType.ARRAY)))
+                if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
                 {
                     writer.WriteStartElement(keyName);
                     IPListNode node = (IPListNode)item;
@@ -60,6 +64,60 @@ namespace Danny.Lib.Xml.PListXml
                 base.Add(val);
                 this.Value = val;
             }
+        }
+
+        /**
+          * @ 将IPListNode对象转换为JSON字符串
+          * */
+        public void WriterJson(TextWriter writer)
+        {
+            writer.Write(Utilities.JSON_BRACKET_LEFT);
+            int len = this.Count();
+            for (int i = 0; i < len; i++)
+            {
+                var item = this[i];
+                NodeValueType lvt = PListFactory.GetValueType(item.Value);
+                string keyName = lvt.ToString().ToLower();
+
+                if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
+                {
+                    IPListNode node = (IPListNode)item;
+                    node.WriterJson(writer);
+                    string comma = Utilities.IsWriterComma(len, i, 1);
+                    writer.Write(comma);
+                }
+                else
+                {
+                    PListFactory.FormatJson(writer, "", item);
+                    string comma = Utilities.IsWriterComma(len, i, 1);
+                    writer.Write(comma);
+                }
+            }
+            writer.Write(Utilities.JSON_BRACKET_RIGHT);
+        }
+
+        /**
+         * @ 将 LdfHashtable 转换成JSON字符串
+         * */
+        public string ToJson()
+        {
+            string result = string.Empty;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                TextWriter writer = new StreamWriter(ms);
+                WriterJson(writer);
+                writer.Flush();
+                result = Encoding.UTF8.GetString(ms.ToArray());
+            }
+
+            return result;
+        }
+
+        /**
+         * @ 将JSON转换为IPListNode对象
+         * */
+        public void ReaderJson(TextReader reader)
+        {
         }
 
         /**

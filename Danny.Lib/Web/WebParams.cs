@@ -14,13 +14,13 @@ namespace Danny.Lib.Web
      * @ 创建 Web参数包装对象
      * */
     [Serializable]
-    public class DLWebParams : Dictionary<string, object>, IDisposable
+    public class WebParams : Dictionary<string, object>, IDisposable
     {
         #region Identity
         /***
          * @ 析构函数，清理托管资源
          * */
-        ~DLWebParams()
+        ~WebParams()
         {
             Dispose(false);
         }
@@ -28,13 +28,13 @@ namespace Danny.Lib.Web
         /**
          * @ 序列化参数构造函数
          * */
-        protected DLWebParams(SerializationInfo info, StreamingContext contex)
+        protected WebParams(SerializationInfo info, StreamingContext contex)
             : base(info, contex) { }
 
         /**
          * @ 默认构造函数
          * */
-        public DLWebParams()
+        public WebParams()
         {
             InitParams();
         }
@@ -58,18 +58,19 @@ namespace Danny.Lib.Web
         /**
          * @ 添加参数
          * */
-        private void AddParams(NameValueCollection values)
+        private void AddParams(NameValueCollection collections)
         {
-            if (values == null || values.Count == 0)
+            if (collections == null || collections.Count == 0)
                 return;
 
-            foreach (var key in values.AllKeys)
+            foreach (var key in collections.AllKeys)
             {
                 string k = key.ToLower().Trim();
                 if (this.ContainsKey(k))
                     continue;
 
-                this.Add(k, values[k]);
+                string valueStr = HttpUtility.UrlEncode(collections[k]);
+                this.Add(k, valueStr);
             }
         }
 
@@ -84,6 +85,25 @@ namespace Danny.Lib.Web
                     return base[key].ToString();
                 return string.Empty;
             }
+        }
+
+        /**
+         * @ 获取Action的参数
+         * @ key 参数名称
+         * @ isHtmlEncode 是否进行 HtmlEncode
+         * */
+        public string GetValue(string key, bool isHtmlEncode = true)
+        {
+            string result = string.Empty;
+            if (!this.ContainsKey(key))
+                return result;
+
+            result = this[key];
+
+            if (isHtmlEncode)
+                result = HttpUtility.HtmlEncode(result);
+
+            return result;
         }
 
         /**

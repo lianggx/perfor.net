@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -21,6 +22,16 @@ namespace Danny.Lib.Xml.PListXml
          * */
         void ReaderXml(XElement reader);
 
+        /**
+         * @ 将IPListNode对象转换为JSON字符串
+         * */
+        void WriterJson(TextWriter writer);
+
+        /**
+         * @ 将JSON转换为IPListNode对象
+         * */
+        void ReaderJson(TextReader reader);
+
         #region Properties
         /***
          * @ 是否存在子元素
@@ -31,6 +42,7 @@ namespace Danny.Lib.Xml.PListXml
          * @ 排序号
          * */
         int Order { get; set; }
+
         /**
          * @ 包装的值
          * */

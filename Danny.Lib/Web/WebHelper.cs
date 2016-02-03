@@ -11,18 +11,30 @@ using System.Web;
 
 namespace Danny.Lib.Web
 {
-    public class DLWebHelper
+    public class WebHelper
     {
         #region Identity
         private static Encoding utf8 = Encoding.UTF8;
-        private static string accept = "gzip, deflate";
+        private static string accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
+        private string acceptEncoding = "gzip, deflate";
+        private string acceptLanguage = "zh-CN,zh;q=0.8";
         private static bool keepalive = true;
         private static bool allowautoredirect = true;
         private static DecompressionMethods automaticdecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
         private static string contenttype = "application/x-www-form-urlencoded;charset=utf8";
         private static string useragent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36";
-        public DLWebHelper() { }
+        public WebHelper() { }
         #endregion
+
+        /**
+         * @ 获取默认的 HttpWebRequest 对象，没有任何附加的httpheader信息
+         * @ url 要请求的URL
+         * */
+        public HttpWebRequest Create(string url)
+        {
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
+            return request;
+        }
 
         /**
          * @ 创建请求的对象
@@ -32,7 +44,7 @@ namespace Danny.Lib.Web
          * */
         public HttpWebRequest Create(string url, ActionType method = ActionType.GET, CookieContainer cookieContainer = null)
         {
-            return Create(url, method, accept, contenttype, useragent, automaticdecompression, allowautoredirect, keepalive, cookieContainer);
+            return Create(url, method, accept, acceptEncoding, acceptLanguage, contenttype, useragent, automaticdecompression, allowautoredirect, keepalive, cookieContainer);
         }
 
         /**
@@ -47,10 +59,12 @@ namespace Danny.Lib.Web
          * @ keepAlive 是否保持连接
          * @ cookieContainer cookie 容器
          * */
-        public HttpWebRequest Create(string url, ActionType method, string acceptEncoding, string contentType, string userAgent, DecompressionMethods automaticDecompression, bool allowAutoRedirect = true, bool keepAlive = true, CookieContainer cookieContainer = null)
+        public HttpWebRequest Create(string url, ActionType method, string accept, string acceptEncoding, string acceptLanguage, string contentType, string userAgent, DecompressionMethods automaticDecompression, bool allowAutoRedirect = true, bool keepAlive = true, CookieContainer cookieContainer = null)
         {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
-            request.Accept = acceptEncoding;
+            request.Accept = accept;
+            request.Headers["Accept-Encoding"] = acceptEncoding;
+            request.Headers["Accept-Language"] = acceptLanguage;
             request.AutomaticDecompression = automaticDecompression;
             request.Method = method.ToString();
             request.AllowAutoRedirect = allowautoredirect;
@@ -87,13 +101,15 @@ namespace Danny.Lib.Web
          * @ catchCookie 是否抓 cookie
          * @ catchHtml 是否下载整个网页
          * */
-        public DLResponseData GetResponse(HttpWebRequest request, bool catchCookie = true, bool catchHtml = true)
+        public WebResponseData GetResponse(HttpWebRequest request, bool catchCookie = true, bool catchHtml = true)
         {
-            DLResponseData rd = new DLResponseData();
+            WebResponseData rd = new WebResponseData();
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
                 Stream responseStream = response.GetResponseStream();
                 StreamReader reader = new StreamReader(responseStream);
+                if (catchHtml)
+                    rd.Html = reader.ReadToEnd();
                 rd.Headers = new Dictionary<string, string>();
                 foreach (var k in response.Headers.AllKeys)
                 {
@@ -109,8 +125,7 @@ namespace Danny.Lib.Web
                         rd.Cookies.Add(response.Cookies[i]);
                     }
                 }
-                if (catchHtml)
-                    rd.Html = reader.ReadToEnd();
+
             }
 
             return rd;
@@ -203,9 +218,9 @@ namespace Danny.Lib.Web
         /**
          * @ 将表单提交
          * */
-        public DLResponseData PostForm(HttpWebRequest request, Dictionary<string, string> form, Dictionary<string, string> webHeaders)
+        public WebResponseData PostForm(HttpWebRequest request, Dictionary<string, string> form, Dictionary<string, string> webHeaders)
         {
-            DLResponseData rd = new DLResponseData();
+            WebResponseData rd = new WebResponseData();
             string postStr = string.Empty;
             foreach (string key in form.Keys)
             {

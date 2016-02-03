@@ -16,6 +16,21 @@ namespace Danny.Lib.Common
      * */
     public partial class Utilities
     {
+        #region Identity
+        /**冒号**/
+        public const String JSON_COLON = ":";
+        /**双引号**/
+        public const String JSON_QUOTES = "\"";
+        /**大括号-左**/
+        public const String JSON_BRACES_LEFT = "{";
+        /**大括号-右**/
+        public const String JSON_BRACES_RIGHT = "}";
+        /**中括号-左**/
+        public const String JSON_BRACKET_LEFT = "[";
+        /**中括号-右**/
+        public const String JSON_BRACKET_RIGHT = "]";
+        #endregion
+
         /**
          * @ 图片压缩
          * @ source 图片流
@@ -83,20 +98,34 @@ namespace Danny.Lib.Common
             return sqlCmdText;
         }
 
+        /**
+         * @ 根据长度判断是否需要写入逗号
+         * @ len 循环长度
+         * @ index 当前下标
+         * @ incremental 增量
+         * @ chars 输入的分隔符号
+         * */
+        public static string IsWriterComma(int len, int index, int incremental, string chars = ",")
+        {
+            string result = (index + incremental == len) ? "" : chars;
+
+            return result;
+        }
+
         #region Function IsValidEmail/Phone/IdCard
-        public static bool IsValidEmail(string strIn)
+        public static bool IsValidEmail(string value)
         {
-            return Regex.IsMatch(strIn, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
+            return Regex.IsMatch(value, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
         }
 
-        public static bool IsValidIdCard(string strIn)
+        public static bool IsValidIdCard(string value)
         {
-            return Regex.IsMatch(strIn, @"^\d{17}([0-9]|X)$");
+            return Regex.IsMatch(value, @"^\d{17}([0-9]|X)$");
         }
 
-        public static bool IsValidPhone(string strIn)
+        public static bool IsValidPhone(string value)
         {
-            return Regex.IsMatch(strIn, "1[3|5|7|8|][0-9]{9}");
+            return Regex.IsMatch(value, "1[3|5|7|8|][0-9]{9}");
         }
         #endregion
     }
