@@ -17,7 +17,7 @@ namespace Danny.Lib.Web
     public class WebParams : Dictionary<string, object>, IDisposable
     {
         #region Identity
-        /***
+        /**
          * @ 析构函数，清理托管资源
          * */
         ~WebParams()
@@ -29,7 +29,10 @@ namespace Danny.Lib.Web
          * @ 序列化参数构造函数
          * */
         protected WebParams(SerializationInfo info, StreamingContext contex)
-            : base(info, contex) { }
+            : base(info, contex)
+        {
+            InitParams();
+        }
 
         /**
          * @ 默认构造函数
@@ -69,7 +72,7 @@ namespace Danny.Lib.Web
                 if (this.ContainsKey(k))
                     continue;
 
-                string valueStr = HttpUtility.UrlEncode(collections[k]);
+                string valueStr = collections[k];
                 this.Add(k, valueStr);
             }
         }
@@ -79,12 +82,7 @@ namespace Danny.Lib.Web
          * */
         public new string this[string key]
         {
-            get
-            {
-                if (this.ContainsKey(key))
-                    return base[key].ToString();
-                return string.Empty;
-            }
+            get { return GetValue(key); }
         }
 
         /**
@@ -94,12 +92,10 @@ namespace Danny.Lib.Web
          * */
         public string GetValue(string key, bool isHtmlEncode = true)
         {
-            string result = string.Empty;
             if (!this.ContainsKey(key))
-                return result;
+                return null;
 
-            result = this[key];
-
+            string result = HttpUtility.UrlDecode(this[key]);
             if (isHtmlEncode)
                 result = HttpUtility.HtmlEncode(result);
 

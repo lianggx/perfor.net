@@ -13,12 +13,14 @@ namespace Danny.Lib.Xml
      * */
     public sealed class XmlParser
     {
+        #region Identity
         /**
          * @ 私有构造函数，成员都是 static ，无需初始化
          * */
         private XmlParser()
         {
         }
+        #endregion
 
         /**
          * @ 检查 xml 对象的声明是否符合规范

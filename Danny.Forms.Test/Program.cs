@@ -10,6 +10,7 @@ using Danny.Lib.Web;
 using Danny.Lib.Xml;
 using Danny.Lib.Xml.PListXml;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Danny.Forms.Test
 {
@@ -273,14 +275,19 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             ht4["ht3"] = ht3;
             array.Add(ht4);
             ht["array"] = array;
+
             string result = ht.ToXmlString();
             PListDict node = new PListDict();
             node.FromXmlString(result);
             string nodestr = node.ToJson();
             string arrayJson = array.ToJson();
-            Console.WriteLine(result);
             Console.WriteLine(nodestr);
-
+            JToken jsonObj = (JToken)JsonConvert.DeserializeObject(nodestr);
+            JToken jsonArray = (JToken)JsonConvert.DeserializeObject(arrayJson);
+            IPListNode node2 = new PListArray();
+            node2 = node2.FromJson(nodestr);
+            string str3 = node2.ToJson();
+            Console.WriteLine(str3);
         }
 
         static void TestPListParse()

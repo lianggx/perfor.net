@@ -179,7 +179,7 @@ namespace Danny.Lib.Helpers.Mssql
                 cmdText.AppendLine(string.Format("{0} {1}", insertBuilder.ToString(), valuesBuilder.ToString()));
             }
             SQLCmdText = cmdText.ToString().ToTrimSpace();
-            return SQLCmdText.IsNotNull();
+            return SQLCmdText.IsNotNullOrEmpty();
         }
 
         /**

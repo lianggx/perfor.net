@@ -1,6 +1,7 @@
 ﻿using Danny.Lib.Common;
 using Danny.Lib.Extension;
-
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace Danny.Lib.Xml.PListXml
         /**
          * @ 将JSON转换为IPListNode对象
          * */
-        public abstract void ReaderJson(TextReader reader);
+        public abstract void ReaderJson(JToken token);
 
         /**
          * @ 把plist对象反序列化为plist格式的文件
@@ -86,9 +87,18 @@ namespace Danny.Lib.Xml.PListXml
         /**
          * @ 将json字符串反序列化为plist对象
          * */
-        public virtual void FromJson(string json)
+        public virtual IPListNode FromJson(string json)
         {
-            throw new NotImplementedException();
+            IPListNode node = null;
+            JToken token = JsonConvert.DeserializeObject<JToken>(json);
+            if (token.Type == JTokenType.Array)
+                node = new PListArray();
+            else if (token.Type == JTokenType.Object)
+                node = new PListDict();
+
+            node.ReaderJson(token);
+
+            return node;
         }
 
         /**
@@ -125,7 +135,7 @@ namespace Danny.Lib.Xml.PListXml
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);            
+            GC.SuppressFinalize(this);
         }
 
         /**
@@ -182,7 +192,7 @@ namespace Danny.Lib.Xml.PListXml
         * */
         protected virtual void FromStream(Stream stream)
         {
-            XDocument doc = XDocument.Load(stream);
+            XDocument doc = XDocument.Load(stream, LoadOptions.None);
             XElement dict = doc.Root.Element("dict");
             ReaderXml(dict);
         }
@@ -194,7 +204,7 @@ namespace Danny.Lib.Xml.PListXml
         protected virtual void WriterToStream(Stream stream)
         {
             XmlTextWriter xmlwriter = new XmlTextWriter(stream, Encoding.UTF8);
-            xmlwriter.Formatting = Formatting.Indented;
+            xmlwriter.Formatting = System.Xml.Formatting.Indented;
             xmlwriter.WriteStartDocument();
             xmlwriter.WriteDocType("plist", "-//Apple//DTD PLIST 1.0//EN", "http://www.apple.com/DTDs/PropertyList-1.0.dtd", null);
             xmlwriter.WriteStartElement("plist");
@@ -285,7 +295,7 @@ namespace Danny.Lib.Xml.PListXml
         {
             string result = string.Empty;
             NodeValueType valueType = GetValueType(ht.Value);
-            if (key.IsNotNull())
+            if (key.IsNotNullOrEmpty())
             {
                 writer.Write(string.Format("{0}{1}{0}{2}", Utilities.JSON_QUOTES, key, Utilities.JSON_COLON));
             }
@@ -361,6 +371,64 @@ namespace Danny.Lib.Xml.PListXml
                     break;
             }
             return node;
+        }
+
+        /**
+ * @ 转换JToken对象到IPListNode
+ * */
+        protected IPListNode SwitchJToken(JToken token)
+        {
+            IPListNode node = null;
+            switch (token.Type)
+            {
+                case JTokenType.Array:
+                    node = new PListArray();
+                    SetNodeTag(node, token);
+                    node.ReaderJson(token);
+                    break;
+                case JTokenType.Object:
+                    node = new PListDict();
+                    SetNodeTag(node, token);
+                    node.ReaderJson(token);
+                    break;
+                default:
+                    node = new PListDict();
+                    if (token.Type == JTokenType.Property)
+                    {
+                        JProperty jproperty = (JProperty)token;
+                        IPListNode childrenNode = null;
+                        if (jproperty.Value.Type == JTokenType.Array) { childrenNode = new PListArray(); }
+                        else { childrenNode = new PListDict(); }
+
+                        childrenNode.Tag = jproperty.Name;
+                        ((PListDict)node).Add(childrenNode.Tag, childrenNode);
+                        childrenNode.ReaderJson(jproperty.Value);
+                    }
+                    else
+                    {
+                        // 如果上级是数组不用设置 tag 的
+                        SetNodeTag(node, token);
+                        JValue jValue = (JValue)token;
+                        node.Value = jValue.Value;
+                    }
+                    break;
+            }
+            return node;
+        }
+
+        /**
+         * @ 设置节点的 Tag 属性
+         * @ node 要设置的节点
+         * @ token 当前要处理的json 对象
+         * */
+        private void SetNodeTag(IPListNode node, JToken token)
+        {
+            // 如果上级是数组不用设置 tag 的
+            if (token.Parent.Type == JTokenType.Array)
+                return;
+
+            JProperty jproperty = (JProperty)token.Parent;
+            node.Tag = jproperty.Name;
         }
         #endregion
     }

@@ -77,7 +77,7 @@ namespace Danny.Lib.Helpers
                     throw new ArgumentNullException("connectionStrings在配置文件中已设置，但没有找到可用的连接字符串");
                 }
                 string dbtypekey = ConfigurationManager.AppSettings[DbTypeKey];
-                if (dbtypekey.IsNotNull())
+                if (dbtypekey.IsNotNullOrEmpty())
                 {
                     Enum.TryParse<SQLDataBaseType>(dbtypekey, out dbType);
                 }

@@ -61,23 +61,23 @@ namespace Danny.Lib.Xml.PListXml
             foreach (var item in properties)
             {
                 WriteElementKey(writer, item.Key);
-                NodeValueType lvt;
+                NodeValueType valueType;
                 bool hasChildren = item.Value.HasChildren;
                 object objValue = null;
                 if (hasChildren)
                 {
-                    lvt = GetValueType(item.Value);
+                    valueType = GetValueType(item.Value);
                     objValue = item.Value;
                 }
                 else
                 {
-                    lvt = GetValueType(item.Value.Value);
+                    valueType = GetValueType(item.Value.Value);
                     objValue = item.Value.Value;
                 }
 
-                string keyName = lvt.ToString().ToLower();
+                string keyName = valueType.ToString().ToLower();
 
-                if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
+                if (valueType == (valueType & (NodeValueType.DICT | NodeValueType.ARRAY)))
                 {
                     writer.WriteStartElement(keyName);
                     ((IPListNode)objValue).WriterXml(writer);
@@ -123,20 +123,20 @@ namespace Danny.Lib.Xml.PListXml
             int index = 0;
             foreach (var item in this)
             {
-                NodeValueType lvt;
+                NodeValueType valueType;
                 bool hasChildren = item.Value.HasChildren;
                 object objValue = null;
                 if (hasChildren)
                 {
-                    lvt = GetValueType(item.Value);
+                    valueType = GetValueType(item.Value);
                     objValue = item.Value;
                 }
                 else
                 {
-                    lvt = GetValueType(item.Value.Value);
+                    valueType = GetValueType(item.Value.Value);
                     objValue = item.Value.Value;
                 }
-                if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
+                if (valueType == (valueType & (NodeValueType.DICT | NodeValueType.ARRAY)))
                 {
                     writer.Write(string.Format("{0}{1}{0}{2}", Utilities.JSON_QUOTES, item.Key, Utilities.JSON_COLON));
                     ((IPListNode)objValue).WriterJson(writer);
@@ -157,15 +157,13 @@ namespace Danny.Lib.Xml.PListXml
         /**
          * @ 重写父类的方法
          * */
-        public override void ReaderJson(TextReader reader)
+        public override void ReaderJson(JToken token)
         {
-        }
-
-        public override bool HasChildren
-        {
-            get
+            IEnumerable<JToken> tokens = token.Values();
+            foreach (var item in tokens)
             {
-                return Count > 0;
+                IPListNode node = SwitchJToken(item);
+                this.Add(node.Tag, node);
             }
         }
 
@@ -180,7 +178,24 @@ namespace Danny.Lib.Xml.PListXml
             Clear();
             disposing = true;
         }
+        #endregion
 
+        #region Properties
+
+        /**
+         * @ 重写属性
+         * */
+        public override bool HasChildren
+        {
+            get
+            {
+                return Count > 0;
+            }
+        }
+
+        /**
+         * @ 获取当前包含IPListNode对象的容器
+         * */
         public Dictionary<string, IPListNode> Items
         {
             get
@@ -190,7 +205,7 @@ namespace Danny.Lib.Xml.PListXml
         }
         #endregion
 
-        #region IDictionary
+        #region 实现 IDictionary 接口
 
         public void Add(string key, IPListNode value)
         {
@@ -231,17 +246,17 @@ namespace Danny.Lib.Xml.PListXml
         {
             get
             {
-                IPListNode ht = null;
-                NodeValueType lvt = GetValueType(this.Value);
-                if (lvt == NodeValueType.ARRAY && key.IsInt())
+                IPListNode plistNode = null;
+                NodeValueType valueType = GetValueType(this.Value);
+                if (valueType == NodeValueType.ARRAY && key.IsInt())
                 {
                     IList list = this.Value as IList;
-                    ht = list[key.ObjToInt()] as IPListNode;
+                    plistNode = list[key.ObjToInt()] as IPListNode;
                 }
                 else
-                    ht = properties[key];
+                    plistNode = properties[key];
 
-                return ht;
+                return plistNode;
             }
             set
             {

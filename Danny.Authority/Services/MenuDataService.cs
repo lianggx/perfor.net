@@ -54,7 +54,7 @@ namespace Danny.Authority.Services
             getsome.AddWhere("ParentPath", SQLExpression.ExprOperator.Like, id, SQLExpression.JoinType.OR);
             string[] fields = { "TOP 1 ID" };
             List<SQLDataResult> list = getsome.Select(fields, "");
-            bool has = list.Count > 0 && (list[0]["ID"] as string).IsNotNull();
+            bool has = list.Count > 0 && (list[0]["ID"] as string).IsNotNullOrEmpty();
             return has;
         }
 

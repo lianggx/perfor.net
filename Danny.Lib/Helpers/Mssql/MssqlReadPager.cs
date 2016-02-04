@@ -237,7 +237,7 @@ namespace Danny.Lib.Helpers.Mssql
             if (TableName.IsNullOrEmpty())
                 throw new ArgumentNullException("必须设置属性TableName的值，该值为查询的主表名称");
 
-            if (leftJoin.IsNotNull() && tableAlias.IsNullOrEmpty())
+            if (leftJoin.IsNotNullOrEmpty() && tableAlias.IsNullOrEmpty())
                 throw new ArgumentNullException("当存在多表连接查询时，必须指定主表的别名，即属性TableAlias的值");
 
             if (fields.IsNullOrEmpty())
@@ -254,7 +254,7 @@ namespace Danny.Lib.Helpers.Mssql
 
             string alias = string.Empty;
             string pk = string.Empty;
-            if (tableAlias.IsNotNull())
+            if (tableAlias.IsNotNullOrEmpty())
             {
                 alias = string.Format("AS {0}", tableAlias);
                 pk = string.Format("{0}.{1}", tableAlias, primaryKey);

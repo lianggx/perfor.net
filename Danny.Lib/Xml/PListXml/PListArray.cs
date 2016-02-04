@@ -9,12 +9,14 @@ using System.Xml.Linq;
 using Danny.Lib.Extension;
 using Danny.Lib.Common;
 using System.Collections;
+using Newtonsoft.Json.Linq;
 
 namespace Danny.Lib.Xml.PListXml
 {
     /**
      * @ plist格式的 array 包装类
      * */
+    [Serializable]
     public partial class PListArray : PListCollection, IList<IPListNode>
     {
         #region Identity
@@ -29,10 +31,10 @@ namespace Danny.Lib.Xml.PListXml
         {
             foreach (var item in properties)
             {
-                NodeValueType lvt = GetValueType(item.Value);
-                string keyName = lvt.ToString().ToLower();
+                NodeValueType valueType = GetValueType(item.Value);
+                string keyName = valueType.ToString().ToLower();
 
-                if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
+                if (valueType == (valueType & (NodeValueType.DICT | NodeValueType.ARRAY)))
                 {
                     writer.WriteStartElement(keyName);
                     IPListNode node = (IPListNode)item;
@@ -76,10 +78,10 @@ namespace Danny.Lib.Xml.PListXml
             for (int i = 0; i < len; i++)
             {
                 var item = this[i];
-                NodeValueType lvt = GetValueType(item.Value);
-                string keyName = lvt.ToString().ToLower();
+                NodeValueType valueType = GetValueType(item.Value);
+                string keyName = valueType.ToString().ToLower();
 
-                if (lvt == (lvt & (NodeValueType.DICT | NodeValueType.ARRAY)))
+                if (valueType == (valueType & (NodeValueType.DICT | NodeValueType.ARRAY)))
                 {
                     IPListNode node = (IPListNode)item;
                     node.WriterJson(writer);
@@ -99,17 +101,48 @@ namespace Danny.Lib.Xml.PListXml
         /**
          * @ 将JSON转换为IPListNode对象
          * */
-        public override void ReaderJson(TextReader reader)
+        public override void ReaderJson(JToken token)
         {
+            IEnumerable<JToken> tokens = token.Values();
+            foreach (var item in tokens)
+            {
+                IPListNode node = SwitchJToken(item);
+                this.Add(node);
+            }
         }
 
+        /**
+         * @ 清理托管资源
+         * */
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                return;
+
+            Clear();
+            disposing = true;
+        }
+        #endregion
+
+        #region Properties
+        /**
+         * @ 重写父类属性
+         * */
         public override bool HasChildren
         {
             get { return properties.Count > 0; }
         }
+
+        /**
+         * @ 获取当前包含IPListNode对象的容器
+         * */
+        public List<IPListNode> List
+        {
+            get { return properties; }
+        }
         #endregion
 
-        #region IList
+        #region 实现 IList 接口
         public int IndexOf(IPListNode item)
         {
             return properties.IndexOf(item);
@@ -191,20 +224,6 @@ namespace Danny.Lib.Xml.PListXml
         IEnumerator IEnumerable.GetEnumerator()
         {
             return properties.GetEnumerator();
-        }
-        #endregion
-
-        #region IPListNode
-        /**
-         * @ 清理托管资源
-         * */
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-                return;
-
-            Clear();
-            disposing = true;
         }
         #endregion
     }

@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Runtime.Serialization;
 using System.Collections;
+using Newtonsoft.Json.Linq;
 
 namespace Danny.Lib.Xml
 {
@@ -23,6 +24,7 @@ namespace Danny.Lib.Xml
         public XmlDict() { }
         #endregion
 
+        #region Self
         /**
          * @ 加载 xml 文件
          * @ fileName 文件全路径
@@ -110,7 +112,7 @@ namespace Danny.Lib.Xml
         /**
          * @ 将JSON转换为IPListNode对象
          * */
-        public override void ReaderJson(TextReader reader)
+        public override void ReaderJson(JToken token)
         {
         }
 
@@ -125,12 +127,17 @@ namespace Danny.Lib.Xml
             properties.Clear();
             disposing = true;
         }
+        #endregion
 
         #region Properties
         /**
          * @ 当前字典是否包含有子元素
          * */
         public override bool HasChildren { get { return Count > 0; } }
+
+        /**
+         * @ 获取当前包含IPListNode对象的容器
+         * */
         public Dictionary<string, IPListNode> Items
         {
             get
@@ -141,7 +148,7 @@ namespace Danny.Lib.Xml
 
         #endregion
 
-        #region IDictionary
+        #region 实现 IDictionary 接口
 
         public void Add(string key, IPListNode value)
         {
@@ -182,8 +189,8 @@ namespace Danny.Lib.Xml
         {
             get
             {
-                if (this.ContainsKey(key) == false)
-                    throw new KeyNotFoundException(string.Format("元素 \"{0}\" 不包含Key：\"{1}\"", this.Tag, key));
+                if (!this.ContainsKey(key))
+                    return null;
 
                 object objVal = properties[key];
                 if (objVal == null)

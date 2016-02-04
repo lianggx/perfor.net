@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -29,7 +30,7 @@ namespace Danny.Lib.Xml.PListXml
         /**
          * @ 将JSON转换为IPListNode对象
          * */
-        void ReaderJson(TextReader reader);
+        void ReaderJson(JToken token);
 
         /**
          * @ 将对象写入 xmlWriter 流中
@@ -37,7 +38,7 @@ namespace Danny.Lib.Xml.PListXml
          * */
         void ToXmlFile(string file);
 
-        /***
+        /**
          * @ 从 XElement 读取元素
          * @ reader XElement 对象
          * */
@@ -51,7 +52,7 @@ namespace Danny.Lib.Xml.PListXml
         /**
          * @ 将JSON转换为IPListNode对象
          * */
-        void FromJson(string json);
+        IPListNode FromJson(string json);
 
         /**
          * @ 序列化为plist字符串
@@ -69,7 +70,7 @@ namespace Danny.Lib.Xml.PListXml
         void FromXmlString(string plist);
 
         #region Properties
-        /***
+        /**
          * @ 是否存在子元素
          * */
         bool HasChildren { get; }

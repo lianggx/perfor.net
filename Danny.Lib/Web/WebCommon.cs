@@ -83,12 +83,10 @@ namespace Danny.Lib.Web
          * */
         public static HttpCookie AddCookie(string name, string value, DateTime expires, string domain = null)
         {
-            HttpResponse response = HttpContext.Current.Response;
-            if (response == null)
-                throw new NullReferenceException("参数  HttpContext.Current.Response 不能为空");
             if (name.IsNullOrEmpty())
                 throw new NullReferenceException("参数 name 不能为空");
 
+            HttpResponse response = HttpContext.Current.Response;
             HttpCookie cookie = response.Cookies[name];
             if (cookie == null)
             {
@@ -97,7 +95,7 @@ namespace Danny.Lib.Web
             }
 
             cookie.Expires = expires;
-            if (domain.IsNotNull())
+            if (domain.IsNotNullOrEmpty())
                 cookie.Domain = domain;
 
             response.SetCookie(cookie);
@@ -111,12 +109,9 @@ namespace Danny.Lib.Web
          * */
         public static string GetCookie(string name)
         {
-            HttpResponse response = HttpContext.Current.Response;
-            if (response == null)
-                throw new NullReferenceException("参数 HttpContext.Current.Response 不能为空");
             if (name.IsNullOrEmpty())
                 throw new NullReferenceException("参数 name 不能为空");
-
+            HttpResponse response = HttpContext.Current.Response;
             HttpCookie cookie = response.Cookies[name];
             if (cookie == null)
                 return null;

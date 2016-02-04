@@ -98,7 +98,7 @@ namespace Danny.Lib.Helpers.Mssql
             string whereString = GetCondition();
 
             SQLCmdText = string.Format("UPDATE {0} SET {1} {2}", TableName, updateString, whereString);
-            return SQLCmdText.IsNotNull();
+            return SQLCmdText.IsNotNullOrEmpty();
         }
 
         /**

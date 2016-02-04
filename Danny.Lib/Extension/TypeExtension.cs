@@ -25,7 +25,7 @@ namespace Danny.Lib.Extension
 
         #endregion
 
-        #region Validatetor
+        #region Validator
 
         public static bool IsInt(this string str)
         {
@@ -43,7 +43,7 @@ namespace Danny.Lib.Extension
         /**
          *  @ 判断传入的字符串是否不为空
          * */
-        public static bool IsNotNull(this string str)
+        public static bool IsNotNullOrEmpty(this string str)
         {
             bool isNotNull = string.IsNullOrEmpty(str) == false;
             return isNotNull;
@@ -62,7 +62,7 @@ namespace Danny.Lib.Extension
         /**
          * @ 判断数组是否不为空
          * */
-        public static bool IsNotNull(this IEnumerable<string> array)
+        public static bool IsNotNullOrEmpty(this IEnumerable<string> array)
         {
             bool isNotNull = array != null && array.Count() > 0;
 
@@ -101,7 +101,7 @@ namespace Danny.Lib.Extension
             return false;
         }
 
-        public static bool IsNotNull<T>(this IEnumerable<T> value)
+        public static bool IsNotNullOrEmpty<T>(this IEnumerable<T> value)
         {
             bool isNotNull = false;
             if (value == null)
@@ -151,6 +151,18 @@ namespace Danny.Lib.Extension
             {
                 if (value != null)
                     result = Convert.ToInt32(value);
+            }
+            catch { }
+            return result;
+        }
+
+        public static decimal ObjToDecimal(this object value)
+        {
+            decimal result = 0;
+            try
+            {
+                if (value != null)
+                    result = Convert.ToDecimal(value);
             }
             catch { }
             return result;
@@ -210,7 +222,7 @@ namespace Danny.Lib.Extension
         public static T CopyTo<T>(this T TSource, T TTarget, params string[] filter) where T : class
         {
             PropertyInfo[] properties = TSource.GetType().GetProperties();
-            if (filter.IsNotNull())
+            if (filter.IsNotNullOrEmpty())
             {
                 for (int i = 0; i < properties.Length; i++)
                 {
@@ -233,7 +245,6 @@ namespace Danny.Lib.Extension
 
         #endregion
 
-        
         #region String.To
         public static string ToNorString(this Guid value)
         {
@@ -478,34 +489,20 @@ namespace Danny.Lib.Extension
 
         public static int ToInt(this bool value)
         {
-            int val = 0;
-            try
-            {
-                val = Convert.ToInt32(value);
-            }
-            catch { }
+            int val = Convert.ToInt32(value);
             return val;
         }
 
         public static int ToInt(this Nullable<bool> value)
         {
-            int val = 0;
-            try
-            {
-                val = Convert.ToInt32(value);
-            }
-            catch { }
-            return val;
+            if (value.HasValue)
+                return Convert.ToInt32(value);
+            return 0;
         }
 
         public static int ToInt(this Enum value)
         {
-            int val = 0;
-            try
-            {
-                val = Convert.ToInt32(value);
-            }
-            catch { }
+            int val = Convert.ToInt32(value);
             return val;
         }
 
