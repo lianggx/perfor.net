@@ -62,18 +62,8 @@ namespace Danny.Lib.Xml.PListXml
             {
                 WriteElementKey(writer, item.Key);
                 NodeValueType valueType;
-                bool hasChildren = item.Value.HasChildren;
-                object objValue = null;
-                if (hasChildren)
-                {
-                    valueType = GetValueType(item.Value);
-                    objValue = item.Value;
-                }
-                else
-                {
-                    valueType = GetValueType(item.Value.Value);
-                    objValue = item.Value.Value;
-                }
+                object objValue;
+                GetValueType(item, out valueType, out objValue);
 
                 string keyName = valueType.ToString().ToLower();
 
@@ -124,18 +114,8 @@ namespace Danny.Lib.Xml.PListXml
             foreach (var item in this)
             {
                 NodeValueType valueType;
-                bool hasChildren = item.Value.HasChildren;
-                object objValue = null;
-                if (hasChildren)
-                {
-                    valueType = GetValueType(item.Value);
-                    objValue = item.Value;
-                }
-                else
-                {
-                    valueType = GetValueType(item.Value.Value);
-                    objValue = item.Value.Value;
-                }
+                object objValue;
+                GetValueType(item, out valueType, out objValue);
                 if (valueType == (valueType & (NodeValueType.DICT | NodeValueType.ARRAY)))
                 {
                     writer.Write(string.Format("{0}{1}{0}{2}", Utilities.JSON_QUOTES, item.Key, Utilities.JSON_COLON));
@@ -152,6 +132,26 @@ namespace Danny.Lib.Xml.PListXml
                 index++;
             }
             writer.Write(Utilities.JSON_BRACES_RIGHT);
+        }
+
+
+        /**
+        * @ 获取节点的值类型
+        **/
+        private void GetValueType(KeyValuePair<string, IPListNode> item, out NodeValueType valueType, out object objValue)
+        {
+            bool hasChildren = item.Value.HasChildren;
+            objValue = null;
+            if (hasChildren)
+            {
+                valueType = GetValueType(item.Value);
+                objValue = item.Value;
+            }
+            else
+            {
+                valueType = GetValueType(item.Value.Value);
+                objValue = item.Value.Value;
+            }
         }
 
         /**

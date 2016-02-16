@@ -103,6 +103,7 @@
     <Compile Include="Common\Utilities.cs" />
     <Compile Include="Enums\ActionType.cs" />
     <Compile Include="Helpers\Mssql\MssqlGetSomeOne.cs" />
+    <Compile Include="Helpers\Mssql\MssqlQueryHelper.cs" />
     <Compile Include="Web\CookieConvert.cs" />
     <Compile Include="Web\WebResponseData.cs" />
     <Compile Include="Web\WebHelper.cs" />

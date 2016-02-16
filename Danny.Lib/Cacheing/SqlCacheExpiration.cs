@@ -55,7 +55,7 @@ namespace Danny.Lib.Cacheing
          * @ sourceChange 数据源更改通知事件
          * @ priority 缓存逐出的优先级
          * */
-        public CacheItem CreateSQLCacheSingle<T>(string key, string cmdText, DateTimeOffset offset, out CacheItemPolicy policy, CacheItemPriority priority = CacheItemPriority.Default) where T : class,new()
+        public CacheItem CreateSQLCacheSingle<T>(string key, string cmdText, DateTimeOffset offset, out CacheItemPolicy policy, CacheItemPriority priority = CacheItemPriority.Default) where T : class, new()
         {
             T t = new T();
             policy = new CacheItemPolicy();
@@ -105,7 +105,7 @@ namespace Danny.Lib.Cacheing
         * @ priority 缓存逐出的优先级
         * */
         public CacheItem CreateSQLCacheList<T>(string key, string cmdText, DateTimeOffset offset, out CacheItemPolicy policy, CacheItemPriority priority = CacheItemPriority.Default)
-            where T : class,new()
+            where T : class, new()
         {
             policy = new CacheItemPolicy();
             List<T> resultList = SelectData<T>(cmdText, out dency);
@@ -123,7 +123,7 @@ namespace Danny.Lib.Cacheing
          * @ cmdText sql语句
          * @ dency 依赖对象
          * */
-        private List<T> SelectData<T>(string cmdText, out SqlDependency dency) where T : class,new()
+        private List<T> SelectData<T>(string cmdText, out SqlDependency dency) where T : class, new()
         {
             if (cmdText.IsNullOrEmpty())
             {
@@ -131,28 +131,10 @@ namespace Danny.Lib.Cacheing
             }
 
             List<T> resultList = new List<T>();
-            SqlCommand sqlCmd = null;
-            using (SqlConnection conn = new SqlConnection(dbConnectionString))
+            SqlCommand sqlCmd = GetSqlCmd(cmdText, out dency);
+            using (SqlDataReader reader = sqlCmd.ExecuteReader())
             {
-                cmdText = Utilities.DetectSQLInjection(cmdText);
-                sqlCmd = new SqlCommand(cmdText, conn);
-                if (conn.State != System.Data.ConnectionState.Open)
-                    conn.Open();
-                dency = new SqlDependency(sqlCmd);
-                dency.OnChange += delegate(object sender, SqlNotificationEventArgs e)
-                {
-                    if (e.Type == SqlNotificationType.Change && SourceChange != null)
-                    {
-                        SourceChange(sender, e);
-                    }
-                    else if (e.Type == SqlNotificationType.Subscribe)
-                    {
-                        throw new ArgumentException("请检查sql查询语句是否包含架构信息，并确保查询字段不使用*号");
-                    }
-
-                };
                 #region 读取数据
-                SqlDataReader reader = sqlCmd.ExecuteReader();
 
                 if (reader.Read())
                 {
@@ -191,36 +173,40 @@ namespace Danny.Lib.Cacheing
          * */
         private T SelectScalar<T>(string cmdText, out SqlDependency dency)
         {
-            if (cmdText.IsNullOrEmpty())
-            {
-                throw new ArgumentNullException("cmdText不能为空");
-            }
-
             T result;
-            SqlCommand sqlCmd = null;
-            using (SqlConnection conn = new SqlConnection(dbConnectionString))
+            using (SqlCommand sqlCmd = GetSqlCmd(cmdText, out dency))
             {
-                cmdText = Utilities.DetectSQLInjection(cmdText);
-                sqlCmd = new SqlCommand(cmdText, conn);
-                if (conn.State != System.Data.ConnectionState.Open)
-                    conn.Open();
-                dency = new SqlDependency(sqlCmd);
-                dency.OnChange += delegate(object sender, SqlNotificationEventArgs e)
-                {
-                    if (e.Type == SqlNotificationType.Change && SourceChange != null)
-                    {
-                        SourceChange(sender, e);
-                    }
-                    else if (e.Type == SqlNotificationType.Subscribe)
-                    {
-                        throw new ArgumentException("请检查sql查询语句是否包含架构信息，并确保查询字段不使用*号");
-                    }
-
-                };
                 result = (T)sqlCmd.ExecuteScalar();
             }
 
             return result;
+        }
+
+        /**
+         * @ 创建 SqlCommand 对象
+         * @
+         **/
+        protected SqlCommand GetSqlCmd(string cmdText, out SqlDependency dency)
+        {
+            SqlConnection conn = new SqlConnection(dbConnectionString);
+            SqlCommand sqlCmd = new SqlCommand(cmdText, conn);
+            if (conn.State != System.Data.ConnectionState.Open)
+                conn.Open();
+            dency = new SqlDependency(sqlCmd);
+            dency.OnChange += delegate(object sender, SqlNotificationEventArgs e)
+            {
+                if (e.Type == SqlNotificationType.Change && SourceChange != null)
+                {
+                    SourceChange(sender, e);
+                }
+                else if (e.Type == SqlNotificationType.Subscribe)
+                {
+                    throw new ArgumentException("请检查sql查询语句是否包含架构信息，并确保查询字段不使用*号");
+                }
+
+            };
+
+            return sqlCmd;
         }
 
         /*

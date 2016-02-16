@@ -14,66 +14,39 @@ namespace Danny.Lib.Helpers.Mssql
     /**
      * @ 分页查询
      * */
-    public partial class MssqlReadPager : SQLHelper
+    public partial class MssqlReadPager : MssqlQueryHelper
     {
         #region Identity
         /**
  * @ 默认构造函数
  * */
-        public MssqlReadPager()
-            : base()
-        {
-            InitializeComponent(null);
-        }
+        public MssqlReadPager() : base() { }
 
         /**
          *  @ 构造函数第一次重载
          *  @ tableName ：要插入的表名
          * */
-        public MssqlReadPager(string tableName)
-            : this(tableName, "")
-        {
-        }
+        public MssqlReadPager(string tableName) : base(tableName, "") { }
 
         /**
          *  @ 构造函数第一次重载
          *  @ tableName ：要插入的表名
          * */
-        public MssqlReadPager(string tableName, string sqlCmdText)
-        {
-            InitializeComponent(tableName, sqlCmdText);
-        }
+        public MssqlReadPager(string tableName, string sqlCmdText) : base(tableName, sqlCmdText) { }
 
         /**
          *  @ 构造函数第二次重载
          *  @ tableName ：要插入的表名
          *  @ context 数据库上下文对象
          * */
-        public MssqlReadPager(string tableName, SQLContext context)
-            : base(context)
-        {
-            InitializeComponent(tableName);
-        }
+        public MssqlReadPager(string tableName, SQLContext context) : base(tableName, context) { }
 
         /**
          *  @ 构造函数第二次重载
          *  @ tableName ：要插入的表名
          *  @ context 数据库上下文对象
          * */
-        public MssqlReadPager(string tableName, SQLContext context, string sqlCmdText)
-            : base(context)
-        {
-            InitializeComponent(tableName, sqlCmdText);
-        }
-
-        /**
-         * @ 初始化内部数据
-         * */
-        private void InitializeComponent(string tableName, string sqlCmdText = null)
-        {
-            SetTableName(tableName);
-            this.SQLCmdText = SQLCmdText;
-        }
+        public MssqlReadPager(string tableName, SQLContext context, string sqlCmdText) : base(tableName, context, sqlCmdText) { }
         #endregion
 
         /**
@@ -83,7 +56,7 @@ namespace Danny.Lib.Helpers.Mssql
          * @ page 页码
          * @ size 页大小
          * */
-        public List<T> Select<T>(int page, int size, out int rowCount) where T : class,new()
+        public List<T> Select<T>(int page, int size, out int rowCount) where T : class, new()
         {
             rowCount = 0;
             List<T> dataList = new List<T>(size);
@@ -112,52 +85,12 @@ namespace Danny.Lib.Helpers.Mssql
          * @ page 页码
          * @ size 页大小
          * */
-        public List<T> Select<T>(IEnumerable<string> fields, string leftJoin, int page, int size, out int rowCount) where T : class,new()
+        public List<T> Select<T>(IEnumerable<string> fields, string leftJoin, int page, int size, out int rowCount) where T : class, new()
         {
-            rowCount = 0;
-            List<T> dataList = new List<T>(size);
-            try
-            {
-                Type type = typeof(T);
-                if (TableName.IsNullOrEmpty())
-                {
-                    TableName = type.Name;
-                }
-
-                DbDataReader reader = DoReader(fields, leftJoin, page, size);
-                if (reader == null)
-                    return null;
-
-                int len = fields.Count();
-                List<string> queryName = new List<string>();
-                for (int i = 0; i < len; i++)
-                {
-                    queryName.Add(reader.GetName(i).ToLower());
-                }
-
-                PropertyInfo[] pis = type.GetProperties();
-                reader.Read();
-                rowCount = reader["DataCount"].ObjToInt();
-                do
-                {
-                    T result = new T();
-                    for (int i = 0; i < pis.Length; i++)
-                    {
-                        PropertyInfo pi = pis[i];
-                        if (queryName.Contains<string>(pi.Name.ToLower()) == false)
-                            continue;
-                        object rValue = reader[pi.Name];
-                        if (rValue != null)
-                            pi.SetValue(result, rValue, null);
-                    }
-                    dataList.Add(result);
-                } while (Context.DbReader.Read());
-
-            }
-            finally
-            {
-                Dispose(false);
-            }
+            DbDataReader reader = DoReader(fields, leftJoin, page, size);
+            reader.Read();
+            rowCount = reader["DataCount"].ObjToInt();
+            List<T> dataList = GetDataResult<T>(reader);
             return dataList;
         }
 
@@ -173,31 +106,13 @@ namespace Danny.Lib.Helpers.Mssql
         {
             rowCount = 0;
             List<SQLDataResult> list = new List<SQLDataResult>();
-            try
-            {
-                DbDataReader reader = DoReader(fields, leftJoin, page, size);
-                if (reader == null || reader.HasRows == false)
-                    return list;
+            DbDataReader reader = DoReader(fields, leftJoin, page, size);
+            if (reader == null || reader.HasRows == false)
+                return list;
 
-                reader.Read();
-                rowCount = reader["DataCount"].ObjToInt();
-                do
-                {
-                    SQLDataResult result = new SQLDataResult();
-                    int len = fields.Count();
-
-                    for (int i = 0; i < len; i++)
-                    {
-                        result.Add(reader.GetName(i), reader.GetValue(i));
-                    }
-                    list.Add(result);
-                } while (Context.DbReader.Read());
-
-            }
-            finally
-            {
-                Dispose(false);
-            }
+            reader.Read();
+            rowCount = reader["DataCount"].ObjToInt();
+            list = GetDataResult(reader);
 
             return list;
         }
@@ -212,8 +127,8 @@ namespace Danny.Lib.Helpers.Mssql
          * */
         private DbDataReader DoReader(IEnumerable<string> fields, string leftJoin, int page, int size)
         {
-            this.fields = fields;
-            this.leftJoin = leftJoin;
+            this.Fields = fields.ToList();
+            this.LeftJoin = leftJoin;
             this.pageIndex = page;
             this.pageSize = size;
             if (InitSQLWithCmdText() == false)
@@ -237,31 +152,31 @@ namespace Danny.Lib.Helpers.Mssql
             if (TableName.IsNullOrEmpty())
                 throw new ArgumentNullException("必须设置属性TableName的值，该值为查询的主表名称");
 
-            if (leftJoin.IsNotNullOrEmpty() && tableAlias.IsNullOrEmpty())
+            if (LeftJoin.IsNotNullOrEmpty() && TableAlias.IsNullOrEmpty())
                 throw new ArgumentNullException("当存在多表连接查询时，必须指定主表的别名，即属性TableAlias的值");
 
-            if (fields.IsNullOrEmpty())
+            if (Fields.IsNullOrEmpty())
                 throw new ArgumentNullException("必须设置要查询的字段fields");
 
-            if (primaryKey.IsNullOrEmpty())
+            if (PrimaryKey.IsNullOrEmpty())
                 throw new ArgumentNullException("必须设置属性PrimaryKey的值为查询主表的主键名称");
 
             if (pageSize < 1)
                 throw new ArgumentNullException("必须设置属性pageSize的值，且该值必须大于0");
 
-            if (orderBy.IsNullOrEmpty())
+            if (OrderBy.IsNullOrEmpty())
                 throw new ArgumentNullException("必须调用SetOrderBy方法进行设置排序字段");
 
             string alias = string.Empty;
             string pk = string.Empty;
-            if (tableAlias.IsNotNullOrEmpty())
+            if (TableAlias.IsNotNullOrEmpty())
             {
-                alias = string.Format("AS {0}", tableAlias);
-                pk = string.Format("{0}.{1}", tableAlias, primaryKey);
+                alias = string.Format("AS {0}", TableAlias);
+                pk = string.Format("{0}.{1}", TableAlias, PrimaryKey);
             }
             else
             {
-                pk = primaryKey;
+                pk = PrimaryKey;
             }
             string whereString = GetCondition();
             string tempTableName = string.Format("{0}{1}", "A", Guid.NewGuid().ToString("N"));
@@ -270,7 +185,7 @@ namespace Danny.Lib.Helpers.Mssql
 SELECT @DataCount =SUM (CASE WHEN (index_id < 2) THEN row_count ELSE 0 END) FROM sys.dm_db_partition_stats
  WHERE object_id = object_id('{0}')", TableName);
             // 按条件查询
-            string mSql = string.Format(@"SELECT @DataCount=COUNT(1) FROM {0} {1} {2} {3}", TableName, alias, leftJoin, whereString);
+            string mSql = string.Format(@"SELECT @DataCount=COUNT(1) FROM {0} {1} {2} {3}", TableName, alias, LeftJoin, whereString);
             SQLCmdText = string.Format(@"DECLARE @DataCount int
 {13}
         SELECT {0},@DataCount as DataCount FROM {1} {2} 
@@ -281,144 +196,14 @@ SELECT @DataCount =SUM (CASE WHEN (index_id < 2) THEN row_count ELSE 0 END) FROM
                     (
                         SELECT TOP {9} {12},ROW_NUMBER() OVER({5}) AS R_NO FROM {1} {2} {3} {6} {5}
                     ){11} WHERE R_NO BETWEEN {8} AND {10}
-            ) {7} {5}", fields.ToJoin(), TableName, alias, leftJoin, primaryKey, orderBy, whereString, groupBy, pageIndex, pageSize, pageIndex * pageSize, tempTableName, pk, whereString.IsNullOrEmpty() ? sysSql : mSql);
+            ) {7} {5}", Fields.ToJoin(), TableName, alias, LeftJoin, PrimaryKey, OrderBy, whereString, GroupBy, pageIndex, pageSize, pageIndex * pageSize, tempTableName, pk, whereString.IsNullOrEmpty() ? sysSql : mSql);
 
 
             Succeed = true;
             return Succeed;
         }
 
-        /**
-         * @ 设置排序
-         * @ tableFields 表字段集合，形如url参数key：数据库真实字段名称
-         * @ orderby 客户端传回要排序的参数，形如：key,order，key即名称，order用int表示，具体参考LdfSQLExpression.Order，0：ASC，1：DESC
-         * @ separator 客户端排序参数的分隔符号
-         * @ defaultField 默认排序字段
-         * @ defaultDirection 默认排序方式
-         * */
-        public string SetOrderBy(Dictionary<string, string> tableFields, string orderby, char separator, string defaultField, SQLExpression.Order defaultDirection = SQLExpression.Order.DESC)
-        {
-            if (defaultField.IsNullOrEmpty())
-                throw new ArgumentException("必须设置默认排序字段");
-
-            string orderField = defaultField;
-            string[] orderValue = orderby.Split(separator);
-            if (orderValue.IsNotNullAndEq(2))
-            {
-                string okey = orderValue[0];
-                if (tableFields.ContainsKey(okey))
-                {
-                    defaultField = tableFields[okey];
-                    string dire = orderValue[1];
-
-                    if (dire.GetType().IsEnum<SQLExpression.Order>())
-                    {
-                        defaultDirection = dire.ToEnum<SQLExpression.Order>();
-                    }
-                }
-            }
-
-            SetOrderBy(defaultField, defaultDirection);
-
-            return orderField;
-        }
-
-        /**
-         * @ 设置排序
-         * @ field 排序字段名称
-         * @ order 指定排序方式
-         * */
-        public void SetOrderBy(string field, SQLExpression.Order direction)
-        {
-            orderBy = string.Format(" ORDER BY {0} {1}", field, direction);
-        }
-
-        /**
-         * @ 设置排序
-         * @ field 排序字段，如 ID DESC,Name ASC
-         * */
-        public void SetOrderBy(string field)
-        {
-            orderBy = string.Format(" ORDER BY {0} ", field);
-        }
-
-        /**
-         * @ 设置分组字段
-         * */
-        public void SetGroupBy(params string[] fields)
-        {
-            if (fields.IsNullOrEmpty())
-                return;
-            groupBy = string.Format(" GROUP BY {0} ", fields.ToJoin(","));
-        }
-
         #region Propeties
-
-        private string tableAlias = string.Empty;
-        /**
-         * @ 主表的别名
-         * */
-        public string TableAlias
-        {
-            get { return tableAlias; }
-            set { tableAlias = value; }
-        }
-
-        private string leftJoin = string.Empty;
-        /**
-         * @ 左连接语句
-         * */
-        public string LeftJoin
-        {
-            get { return leftJoin == null ? "" : leftJoin; }
-            set { leftJoin = value; }
-        }
-
-        private IEnumerable<string> fields = null;
-        /**
-         * @ 要查询的字段名称
-         * */
-        public List<string> Fields
-        {
-            get
-            {
-                if (fields == null)
-                    fields = new List<string>();
-
-                return fields.ToList();
-            }
-            set { fields = value; }
-        }
-
-        private string groupBy = string.Empty;
-        /**
-         * @ 分组字段，形如：groupby xx,xx,xx
-         * */
-        public string GroupBy
-        {
-            get { return groupBy; }
-            set { groupBy = value; }
-        }
-
-        private string orderBy = string.Empty;
-        /**
-       * @ 排序字段，形如：orderby xx asc,xxx desc
-       * */
-        public string OrderBy
-        {
-            get { return orderBy; }
-            set { orderBy = value; }
-        }
-
-        private string primaryKey = string.Empty;
-        /**
-         * @ 主表的主键
-         * */
-        public string PrimaryKey
-        {
-            get { return primaryKey; }
-            set { primaryKey = value; }
-        }
 
         /**
          * @ 页码
