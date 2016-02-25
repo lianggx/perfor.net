@@ -19,6 +19,7 @@ namespace Danny.Lib.Helpers
     public abstract class SQLHelper : IDisposable
     {
         #region Identity
+        private bool m_disposeing = false;
         /**
          *  @ 默认构造函数
          * */
@@ -420,12 +421,13 @@ namespace Danny.Lib.Helpers
         /**
          * @ 关闭数据流对象，关闭数据库连接，重新丢回连接池
          * */
-        protected virtual void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposeing)
         {
-            if (disposing)
-                return;
-
-            context.Close();
+            if (!this.m_disposeing && disposeing)
+            {
+                context.Close();
+                this.m_disposeing = true;
+            }
         }
 
         /**

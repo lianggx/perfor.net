@@ -13,10 +13,11 @@ namespace Danny.Lib.Common
     public class FileHelper : IDisposable
     {
         #region Identity
-        FileStream fileStream = null;
-        StreamWriter streamWriter = null;
-        StreamReader streamReader = null;
-        BinaryFormatter binFormat = null;
+        private bool m_disposing = false;
+        private FileStream fileStream = null;
+        private StreamWriter streamWriter = null;
+        private StreamReader streamReader = null;
+        private BinaryFormatter binFormat = null;
 
         public FileHelper() { }
         ~FileHelper()
@@ -158,26 +159,25 @@ namespace Danny.Lib.Common
          * */
         private void Dispose(bool disposing)
         {
-            if (disposing)
-                return;
-
-            if (fileStream != null)
+            if (!this.m_disposing && disposing)
             {
-                fileStream.Close();
-                fileStream.Dispose();
+                if (fileStream != null)
+                {
+                    fileStream.Close();
+                    fileStream.Dispose();
+                }
+                if (streamWriter != null)
+                {
+                    streamWriter.Close();
+                    streamWriter.Dispose();
+                }
+                if (streamReader != null)
+                {
+                    streamReader.Close();
+                    streamReader.Dispose();
+                }
+                this.m_disposing = true;
             }
-            if (streamWriter != null)
-            {
-                streamWriter.Close();
-                streamWriter.Dispose();
-            }
-            if (streamReader != null)
-            {
-                streamReader.Close();
-                streamReader.Dispose();
-            }
-            disposing = true;
-
         }
     }
 }

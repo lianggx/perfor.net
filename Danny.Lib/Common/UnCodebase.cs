@@ -13,6 +13,7 @@ namespace Danny.Lib.Common
 {
     public class UnCodebase : IDisposable
     {
+        private bool m_disposeing = false;
         public Bitmap bmpobj;
         ~UnCodebase()
         {
@@ -243,14 +244,15 @@ namespace Danny.Lib.Common
             GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool dispose)
+        private void Dispose(bool disposeing)
         {
-            if (dispose)
-                return;
-
-            if (bmpobj != null)
+            if (!this.m_disposeing && disposeing)
             {
-                bmpobj.Dispose();
+                if (bmpobj != null)
+                {
+                    bmpobj.Dispose();
+                }
+                this.m_disposeing = true;
             }
         }
     }

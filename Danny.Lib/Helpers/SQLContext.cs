@@ -26,6 +26,7 @@ namespace Danny.Lib.Helpers
          * */
         private const string DbTypeKey = "DbType";
         private const string defaultConnectionString = "defaultConnectionString";
+        private bool m_disposeing = false;
 
         /**
          * @ 默认构造函数，使用该函数必须在appconfig配置文件中指定connectonstring节
@@ -366,13 +367,13 @@ namespace Danny.Lib.Helpers
         /**
          * @ 清理托管资源
          * */
-        private void Dispose(bool disposing)
+        private void Dispose(bool disposeing)
         {
-            if (disposing)
-                return;
-
-            Close();
-            disposing = true;
+            if (!this.m_disposeing && disposeing)
+            {
+                Close();
+                m_disposeing = true;
+            }
         }
 
         /**

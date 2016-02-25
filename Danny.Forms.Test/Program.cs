@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -25,6 +26,7 @@ namespace Danny.Forms.Test
 {
     static class Program
     {
+        private const int _250 = 250;
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
@@ -41,9 +43,18 @@ namespace Danny.Forms.Test
             //byte[] bytes = str.FromBase64();
             //string method = ActionType.GET.ToString();
             //str = Encoding.UTF8.GetString(bytes);
-
-
-            TestPList();
+            string[] root = Directory.GetDirectories(@"D:\testfolder");
+            for (int i = 0; i < root.Length; i++)
+            {
+                Console.WriteLine(root[i]);
+            }
+            //for (int i = 0; i < 1000000; i++)
+            //{
+            //    string path = string.Format(@"D:\testfolder\{0}", i);
+            //    Directory.CreateDirectory(path);
+            //    Console.WriteLine(i);
+            //}
+            //TestPList();
             Console.WriteLine("succeed");
             Console.ReadKey();
 

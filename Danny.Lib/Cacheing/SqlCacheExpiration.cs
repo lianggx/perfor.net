@@ -17,6 +17,7 @@ namespace Danny.Lib.Cacheing
     public class SqlCacheExpiration : IDisposable
     {
         #region Identity
+        private bool m_disposeing = false;
         private string dbConnectionString = string.Empty;
         public event EventHandler SourceChange;
         private SqlChangeMonitor monitor = null;
@@ -223,13 +224,13 @@ namespace Danny.Lib.Cacheing
          * */
         private void Dispose(bool disposing)
         {
-            if (disposing)
-                return;
+            if (!this.m_disposeing && disposing)
+            {
+                if (monitor != null)
+                    monitor.Dispose();
 
-            if (monitor != null)
-                monitor.Dispose();
-
-            disposing = true;
+                m_disposeing = true;
+            }
         }
     }
 }
