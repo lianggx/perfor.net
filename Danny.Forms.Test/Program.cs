@@ -6,6 +6,7 @@ using Danny.Lib.Enums;
 using Danny.Lib.Extension;
 using Danny.Lib.Helpers;
 using Danny.Lib.Helpers.Mssql;
+using Danny.Lib.Logs;
 using Danny.Lib.Web;
 using Danny.Lib.Xml;
 using Danny.Lib.Xml.PListXml;
@@ -21,12 +22,15 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using ServiceStack.Redis;
+using ServiceStack.ServiceInterface;
 
 namespace Danny.Forms.Test
 {
     static class Program
     {
         private const int _250 = 250;
+
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
@@ -43,11 +47,11 @@ namespace Danny.Forms.Test
             //byte[] bytes = str.FromBase64();
             //string method = ActionType.GET.ToString();
             //str = Encoding.UTF8.GetString(bytes);
-            string[] root = Directory.GetDirectories(@"D:\testfolder");
-            for (int i = 0; i < root.Length; i++)
-            {
-                Console.WriteLine(root[i]);
-            }
+            //string[] root = Directory.GetDirectories(@"D:\testfolder");
+            //for (int i = 0; i < root.Length; i++)
+            //{
+            //    Console.WriteLine(root[i]);
+            //}
             //for (int i = 0; i < 1000000; i++)
             //{
             //    string path = string.Format(@"D:\testfolder\{0}", i);
@@ -55,7 +59,7 @@ namespace Danny.Forms.Test
             //    Console.WriteLine(i);
             //}
             //TestPList();
-            Console.WriteLine("succeed");
+
             Console.ReadKey();
 
             //Application.EnableVisualStyles();
@@ -224,7 +228,7 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             {
                 string msg = Console.ReadLine();
                 Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                client.Connect("www.baidu.com", 80);
+                client.Connect("www.google.com", 80);
                 if (client.Connected)
                 {
                     byte[] bytes = Encoding.UTF8.GetBytes(msg);

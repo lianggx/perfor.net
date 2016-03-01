@@ -24,7 +24,7 @@ namespace Danny.Lib.Converter.Json
             if (reader.Value == null)
                 return false;
 
-            return reader.Value.ObjUnixToDateTime();
+            return reader.Value.ObjToDateTime();
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

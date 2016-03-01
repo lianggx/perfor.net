@@ -15,12 +15,15 @@ namespace Danny.Lib.Logs
     public partial class LogManager
     {
         #region Identity
+        // 日志创建方式
+        private static string[] dateFormarts = { "yyyyMMdd", "yyyyMMdd HH", "yyyyMMdd HH.mm" };
+        public static LogRecordType logRecordType = LogRecordType.Day;
         public static object RemoteLock = new object();
         // 日志路径，不指定则默认使用该路径
         public static string LogPath = "Logs";
         private static object LocalLockObj = new object();
         // 提供异步写日志的支持
-        private delegate void AsyncWrite(string text, LogType type, Exception ex);
+        private delegate void AsyncWrite(string text, LogType type, Exception ex, LogRecordType recordType);
         private delegate void AsyncWriteRemote(string url, string text, LogType type, Exception ex);
         #endregion
 
@@ -30,7 +33,7 @@ namespace Danny.Lib.Logs
         private static void WriteLocal(string text, LogType type, Exception ex)
         {
             AsyncWrite asyncWrite = new AsyncWrite(Write);
-            IAsyncResult result = asyncWrite.BeginInvoke(text, type, ex, null, null);
+            IAsyncResult result = asyncWrite.BeginInvoke(text, type, ex, logRecordType, null, null);
         }
 
         /*
@@ -81,16 +84,13 @@ namespace Danny.Lib.Logs
         /**
          * @ 写入日志
          * */
-        private static void Write(string text, LogType type, Exception ex)
+        private static void Write(string text, LogType type, Exception ex, LogRecordType recordType)
         {
-            string dir = string.Empty;
-            if (LogPath == "Logs")
-            {
-                dir = string.Format("{0}\\{1}\\{2}", System.Environment.CurrentDirectory, LogPath, type.ToString().ToLower());
-            }
+            string dir = string.Format(@"{0}\{1}\{2}\{3}", System.Environment.CurrentDirectory, LogPath, DateTime.Now.ToString("yyyyMMdd"), type.ToString().ToLower());
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
-            string path = string.Format("{0}\\{1}.txt", dir, DateTime.Now.ToString("yyyyMMdd"));
+            string df = dateFormarts[recordType.ToInt()];
+            string path = string.Format("{0}\\{1}.txt", dir, DateTime.Now.ToString(df));
             try
             {
                 lock (LocalLockObj)
@@ -146,6 +146,7 @@ namespace Danny.Lib.Logs
         public static void Warning(string text)
         {
             WriteLocal(text, LogType.WARNING, null);
+
         }
 
         /**
@@ -168,5 +169,18 @@ namespace Danny.Lib.Logs
         ERROR = 20,
         WARNING = 30,
         DEBUG = 40
+    }
+
+    /**
+     * @ 日志文件创建的方式
+     **/
+    public enum LogRecordType
+    {
+        /**按天**/
+        Day = 0,
+        /**按小时**/
+        Hour = 1,
+        /**按分钟**/
+        Minute = 2
     }
 }

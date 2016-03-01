@@ -14,6 +14,7 @@ namespace Danny.Lib.Cacheing
      * */
     public partial class RedisCacheExpiration : ObjectCache
     {
+        #region Identity
         private static PooledRedisClientManager redisPool = null;
         /**
          * @ 构造函数
@@ -33,10 +34,10 @@ namespace Danny.Lib.Cacheing
                 config.MaxWritePoolSize = 60;
             }
             redisPool = new PooledRedisClientManager(writeHost, readHost, config);
-
-            IRedisClientCacheManager manager = redisPool;
         }
+        #endregion
 
+        #region override parent
         /**
          * @ 实现父类的方法
          * @ key 缓存键，存在则覆盖值
@@ -231,13 +232,15 @@ namespace Danny.Lib.Cacheing
                 Set(key, value, DateTimeOffset.MaxValue);
             }
         }
+        #endregion
 
-        private static IRedisClient defaultReadClient = null;
+        #region Properties        
+        private IRedisClient defaultReadClient = null;
 
         /**
          * @ 默认读数据客户端的实例
          * */
-        public static IRedisClient ReadClient
+        public IRedisClient ReadClient
         {
             get
             {
@@ -250,12 +253,12 @@ namespace Danny.Lib.Cacheing
             }
         }
 
-        private static IRedisClient defaultWriteClient = null;
+        private IRedisClient defaultWriteClient = null;
 
         /**
          * @ 默认写数据的客户端
          * */
-        public static IRedisClient WriteClient
+        public IRedisClient WriteClient
         {
             get
             {
@@ -267,6 +270,6 @@ namespace Danny.Lib.Cacheing
                 return defaultWriteClient;
             }
         }
-
+        #endregion
     }
 }

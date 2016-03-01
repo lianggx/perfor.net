@@ -274,7 +274,7 @@ namespace Danny.Lib.Xml.PListXml
                     writer.WriteString(Convert.ToBase64String(ht.Value as byte[]));
                     break;
                 case NodeValueType.DATE:
-                    string plistDate = ht.Value.ObjUnixToDateTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.ffffffZ");
+                    string plistDate = ht.Value.ObjToDateTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.ffffffZ");
                     writer.WriteString(plistDate);
                     break;
                 //case "key":

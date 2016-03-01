@@ -178,7 +178,7 @@ namespace Danny.Lib.Extension
             return false;
         }
 
-        public static DateTime ObjUnixToDateTime(this object value)
+        public static DateTime ObjToDateTime(this object value)
         {
             DateTime dt = Greenwich_Mean_Time;
             try
@@ -203,7 +203,7 @@ namespace Danny.Lib.Extension
                     return val;
                 if (value.GetType() == typeof(DateTime))
                 {
-                    DateTime dt = value.ObjUnixToDateTime();
+                    DateTime dt = value.ObjToDateTime();
                     val = dt.ToUnixDateTime();
                 }
                 else
