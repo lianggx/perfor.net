@@ -1,0 +1,2 @@
+# danny.lib
+common library
