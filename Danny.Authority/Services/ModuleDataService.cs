@@ -13,16 +13,16 @@ namespace Danny.Authority.Services
     /**
      * @ 模块管理
      * */
-    public class ModelDataService : DataOperation<ModelData>
+    public class ModuleDataService : DataOperation<ModuleData>
     {
         #region Identity
-        public ModelDataService() { }
+        public ModuleDataService() { }
         #endregion
 
         /**
          * @ 修改
          * */
-        public override bool Update(IEnumerable<ModelData> menu)
+        public override bool Update(IEnumerable<ModuleData> menu)
         {
             bool succeess = true;
             if (menu.IsNullOrEmpty())
@@ -31,7 +31,7 @@ namespace Danny.Authority.Services
             MssqlUpdate update = new MssqlUpdate(TableName);
             foreach (var item in menu)
             {
-                update.UpdateObject<ModelData>(item);
+                update.UpdateObject<ModuleData>(item);
                 update.AddWhere(Primarykey, item.ID);
                 update.SaveChange();
             }
@@ -42,7 +42,7 @@ namespace Danny.Authority.Services
         /**
          * @ 新增项
          * */
-        public override bool Add(IEnumerable<ModelData> menu)
+        public override bool Add(IEnumerable<ModuleData> menu)
         {
             bool succeess = true;
             if (menu == null)
@@ -52,7 +52,7 @@ namespace Danny.Authority.Services
             foreach (var item in menu)
             {
                 item.ID = Guid.NewGuid().ToString("N");
-                insert.InsertObject<ModelData>(item);
+                insert.InsertObject<ModuleData>(item);
             }
             insert.SaveChange();
 
@@ -64,7 +64,7 @@ namespace Danny.Authority.Services
          * */
         public override string TableName
         {
-            get { return "ModelData"; }
+            get { return "ModuleData"; }
         }
     }
 }

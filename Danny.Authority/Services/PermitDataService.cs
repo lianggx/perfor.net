@@ -13,16 +13,16 @@ namespace Danny.Authority.Services
     /**
      * @ 权限类型数据管理
      * */
-    public class PermDataService : DataOperation<PermData>
+    public class PermitDataService : DataOperation<PermitData>
     {
         #region Identity
-        public PermDataService() { }
+        public PermitDataService() { }
         #endregion
 
         /**
          * @ 修改
          * */
-        public override bool Update(IEnumerable<PermData> menu)
+        public override bool Update(IEnumerable<PermitData> menu)
         {
             bool succeess = true;
             if (menu.IsNullOrEmpty())
@@ -31,7 +31,7 @@ namespace Danny.Authority.Services
             MssqlUpdate update = new MssqlUpdate(TableName);
             foreach (var item in menu)
             {
-                update.UpdateObject<PermData>(item);
+                update.UpdateObject<PermitData>(item);
                 update.AddWhere(Primarykey, item.ID);
                 update.SaveChange();
             }
@@ -42,7 +42,7 @@ namespace Danny.Authority.Services
         /**
          * @ 新增项
          * */
-        public override bool Add(IEnumerable<PermData> menu)
+        public override bool Add(IEnumerable<PermitData> menu)
         {
             bool succeess = true;
             if (menu == null)
@@ -52,7 +52,7 @@ namespace Danny.Authority.Services
             foreach (var item in menu)
             {
                 item.ID = Guid.NewGuid().ToString("N");
-                insert.InsertObject<PermData>(item);
+                insert.InsertObject<PermitData>(item);
             }
             insert.SaveChange();
 
@@ -66,7 +66,7 @@ namespace Danny.Authority.Services
         {
             get
             {
-                return "PermData";
+                return "PermitData";
             }
         }
     }

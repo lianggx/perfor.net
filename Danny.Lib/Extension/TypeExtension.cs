@@ -111,14 +111,13 @@ namespace Danny.Lib.Extension
             return true;
         }
 
-        public static bool IsEnum<T>(this Type value)
+        /**
+         * @ T 枚举类型
+         * @ F 要检查的值类型
+         */
+        public static bool IsEnum<T, F>(this F value)
         {
             return Enum.IsDefined(typeof(T), value);
-        }
-
-        public static bool IsEnum(this Type value)
-        {
-            return value.IsEnum;
         }
 
         public static bool Contains<T>(this IEnumerable<T> value, Func<T, bool> func)
@@ -473,7 +472,7 @@ namespace Danny.Lib.Extension
             return Convert.ToInt16(value);
         }
 
-        public static DateTime ToUnixDateTime(this long value)
+        public static DateTime FromUnixDateTime(this long value)
         {
             DateTime dt = Greenwich_Mean_Time;
             try

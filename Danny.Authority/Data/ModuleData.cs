@@ -9,7 +9,7 @@ namespace Danny.Authority.Data
     /**
      * @ 模块操作实体类
      * */
-    public class ModelData
+    public class ModuleData
     {
         /**
          * @ 操作编号，主键

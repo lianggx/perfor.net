@@ -184,7 +184,7 @@ namespace Danny.Lib.Helpers.Mssql
                     defaultField = tableFields[okey];
                     string dire = orderValue[1];
 
-                    if (dire.GetType().IsEnum<SQLExpression.Order>())
+                    if (dire.IsEnum<SQLExpression.Order,string>())
                     {
                         defaultDirection = dire.ToEnum<SQLExpression.Order>();
                     }

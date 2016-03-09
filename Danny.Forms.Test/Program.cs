@@ -377,14 +377,6 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             //array.Add(new MenuData() { Name = "修改用户", Url = "/user/edit", PID = "80b86ce6cd30467aaaa8f9eb35e74187" });
             //menudata.Add(array);
 
-            PermToFuncService menudata = new PermToFuncService();
-            //List<PermToFunc> array = new List<PermToFunc>();
-            //array.Add(new PermToFunc() { DataType = FuncDataType.Menu, Perm_ID = "259ee1d5ff414b01a9f1ba378981f9b1", Func_ID = "7a585113cdb64d09bee3ca6f0749dc3d" });
-            //array.Add(new PermToFunc() { DataType = FuncDataType.Menu, Perm_ID = "32b4f86b3430417ba58d9ed799c46ee6", Func_ID = "3872485a5814485fb1f9761a25c0b034" });
-            //array.Add(new PermToFunc() { DataType = FuncDataType.Menu, Perm_ID = "882911388ca9447096c9fcecc7c8cde9", Func_ID = "" });
-            //menudata.Add(array);
-            List<SQLDataResult> list = menudata.GetMeumByPermId("259ee1d5ff414b01a9f1ba378981f9b1");
-
             Console.WriteLine("");
 
         }

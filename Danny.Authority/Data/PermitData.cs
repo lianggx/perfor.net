@@ -8,16 +8,20 @@ namespace Danny.Authority.Data
     /**
      * @ 权限类型
      * */
-    public class PermData
+    public class PermitData
     {
         /**
          * @ 类型编号，主键
          * */
         public string ID { get; set; }
         /**
-         * @ 类型名称
+         * @ 标题
          * */
-        public string Name { get; set; }
+        public string Title { get; set; }
+        /**
+         * @ 内容
+         */
+        public string Content { get; set; }
         /**
          * @ 描述/备注
          * */

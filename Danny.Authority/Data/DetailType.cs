@@ -8,7 +8,7 @@ namespace Danny.Authority.Data
     /**
      * @ 权限数据类型
      * */
-    public enum FuncDataType
+    public enum DetailType
     {
         /**
          * @ 菜单
@@ -19,12 +19,12 @@ namespace Danny.Authority.Data
          * */
         Page = 20,
         /**
-         * @ 文件
-         * */
-        File = 30,
-        /**
          * @ 模块
          * */
-        Model = 40
+        Module = 30,
+        /**
+         * 数据
+         */
+        Permit =40,
     }
 }
