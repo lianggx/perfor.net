@@ -64,7 +64,12 @@ namespace Danny.Lib.Xml.PListXml
          * */
         public virtual void FromXmlFile(string file)
         {
-            throw new NotImplementedException();
+            if (!File.Exists(file))
+            {
+                throw new FileNotFoundException(string.Format("未找到文件：{0}", file));
+            }
+
+            FromStream(new FileStream(file, FileMode.Open, FileAccess.Read));
         }
 
         /**
