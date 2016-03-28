@@ -11,6 +11,8 @@ namespace Danny.Lib.Enums
     public enum ActionType
     {
         GET = 10,
-        POST = 20
+        POST = 20,
+        PUT = 30,
+        DELETE = 40
     }
 }

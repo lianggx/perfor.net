@@ -109,6 +109,9 @@
     <Compile Include="Helpers\Mssql\MssqlGetSomeOne.cs" />
     <Compile Include="Helpers\Mssql\MssqlQueryHelper.cs" />
     <Compile Include="Web\CookieConvert.cs" />
+    <Compile Include="Web\Routes\DynamicHelper.cs" />
+    <Compile Include="Web\Routes\WebRoute.cs" />
+    <Compile Include="Web\Routes\WebRouteHandler.cs" />
     <Compile Include="Web\WebResponseData.cs" />
     <Compile Include="Web\WebHelper.cs" />
     <Compile Include="Web\WebCommon.cs" />

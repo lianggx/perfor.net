@@ -11,6 +11,10 @@ namespace Danny.Lib.Web
      * */
     public class WebResponseData
     {
+        /// <summary>
+        ///  连接状态码
+        /// </summary>
+        public int Status { get; set; }
         /**
          * @ Response url
          * */

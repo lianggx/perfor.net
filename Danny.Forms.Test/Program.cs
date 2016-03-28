@@ -1,12 +1,10 @@
-﻿using Danny.Authority.Services;
-using Danny.Forms.Test.example;
+﻿using Danny.Forms.Test.example;
 using Danny.Lib.Cacheing;
 using Danny.Lib.Common;
 using Danny.Lib.Enums;
 using Danny.Lib.Extension;
 using Danny.Lib.Helpers;
 using Danny.Lib.Helpers.Mssql;
-using Danny.Lib.Logs;
 using Danny.Lib.Web;
 using Danny.Lib.Xml;
 using Danny.Lib.Xml.PListXml;
@@ -18,17 +16,20 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
-using ServiceStack.Redis;
-using ServiceStack.ServiceInterface;
+using System.Linq;
+using System.Configuration;
 
 namespace Danny.Forms.Test
 {
     static class Program
     {
+        public static string GetUserName(string name, int age)
+        {
+            return string.Empty;
+        }
         private const int _250 = 250;
 
         /// <summary>
@@ -37,29 +38,59 @@ namespace Danny.Forms.Test
         [STAThread]
         static void Main()
         {
-            //string id = Guid.NewGuid().ToString("N");
-            //DateTime d = DateTime.Now;
-            //Console.WriteLine(d.ToUnixDateTime()*0.001);
-            //DLWebHelper dlRequest = new DLWebHelper();
-            //HttpWebRequest request = dlRequest.Create("http://www.baidu.com", ActionType.GET);
-            //DLResponseData data = dlRequest.GetResponse(request, true, true);
-            //string str = "4X11J15R3AARM5Y6JW6V";
-            //byte[] bytes = str.FromBase64();
-            //string method = ActionType.GET.ToString();
-            //str = Encoding.UTF8.GetString(bytes);
-            //string[] root = Directory.GetDirectories(@"D:\testfolder");
-            //for (int i = 0; i < root.Length; i++)
-            //{
-            //    Console.WriteLine(root[i]);
-            //}
-            //for (int i = 0; i < 1000000; i++)
-            //{
-            //    string path = string.Format(@"D:\testfolder\{0}", i);
-            //    Directory.CreateDirectory(path);
-            //    Console.WriteLine(i);
-            //}
-            //TestPList();
+            byte[] crypt = System.Security.Cryptography.SHA256.Create().Hash;
+            string key = Convert.ToBase64String(crypt);
+            Console.WriteLine(key);
+            Console.ReadKey();
+            return;
+            string[] filters = { "ToString", "GetType", "Equals", "GetHashCode" };
+            IPListNode node = new PListDict();
+            node.FromXmlFile("config.plist");
+            IPListNode login = node["login"];
+            Console.WriteLine("username:{0},password:{1},host:{2}", login["username"].Value, login["password"].Value, login["host"].Value);
+            Console.ReadKey();
+            return;
+            Assembly assembly = Assembly.Load("Danny.Lib");
+            Type[] modules = assembly.GetTypes();
+            List<AssemblyType> types = new List<AssemblyType>(modules.Length);
+            foreach (var item in modules)
+            {
+                if (item.Name != "SQLHelper") continue;
+                MethodInfo[] infos = item.GetMethods(BindingFlags.Public).Where(f => !f.IsSpecialName).ToArray();
 
+                AssemblyType at = new AssemblyType();
+                at.Name = item.Name;
+                at.FullName = item.FullName;
+                at.Methods = new List<AssemblyMethod>(infos.Length);
+                types.Add(at);
+
+                foreach (var mi in infos)
+                {
+                    if (filters.Contains(f => f == mi.Name)) continue;
+                    Console.Write("Method:{0},ReturnType:{1}\nParameters:\n", mi.Name, mi.ReturnType.Name);
+                    ParameterInfo[] pi = mi.GetParameters();
+
+                    AssemblyMethod am = new AssemblyMethod();
+                    am.Name = mi.Name;
+                    am.ReturnType = mi.ReturnType.Name;
+                    am.Paramters = new List<AssemblyParamter>(pi.Length);
+                    at.Methods.Add(am);
+                    foreach (var p in pi)
+                    {
+                        Console.Write("{0}({1}),", p.Name, p.ParameterType.Name);
+
+                        AssemblyParamter ap = new AssemblyParamter();
+                        ap.Name = p.Name;
+                        ap.TypeName = p.ParameterType.Name;
+                        am.Paramters.Add(ap);
+
+                    }
+                    Console.WriteLine();
+                }
+                Console.WriteLine();
+            }
+            string json = JsonConvert.SerializeObject(types);
+            Console.WriteLine(json);
             Console.ReadKey();
 
             //Application.EnableVisualStyles();
@@ -380,5 +411,24 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             Console.WriteLine("");
 
         }
+    }
+
+    public partial class AssemblyType
+    {
+        public string Name { get; set; }
+        public string FullName { get; set; }
+        public List<AssemblyMethod> Methods { get; set; }
+
+    }
+    public partial class AssemblyMethod
+    {
+        public string Name { get; set; }
+        public string ReturnType { get; set; }
+        public List<AssemblyParamter> Paramters { get; set; }
+    }
+    public partial class AssemblyParamter
+    {
+        public string Name { get; set; }
+        public string TypeName { get; set; }
     }
 }

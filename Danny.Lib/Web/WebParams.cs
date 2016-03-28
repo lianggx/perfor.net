@@ -95,7 +95,9 @@ namespace Danny.Lib.Web
             if (!this.ContainsKey(key))
                 return null;
 
-            string result = HttpUtility.UrlDecode(this[key]);
+            object value = string.Empty;
+            this.TryGetValue(key, out value);
+            string result = HttpUtility.UrlDecode(value.ToString());
             if (isHtmlEncode)
                 result = HttpUtility.HtmlEncode(result);
 
