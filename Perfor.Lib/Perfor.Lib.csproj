@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C7698B2D-0B92-480D-A56A-DC27BBA51040}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Perfor.Lib</RootNamespace>
+    <AssemblyName>Perfor.Lib</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <PublishUrl>发布\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
+    <Reference Include="ServiceStack.Common, Version=4.0.50.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Danny.Lib.dll\ServiceStack.Redis.3.9.60\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces, Version=4.0.0.0, Culture=neutral, PublicKeyToken=e06fbc6124f57c43, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Danny.Lib.dll\ServiceStack.Redis.3.9.60\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Redis, Version=4.0.50.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Danny.Lib.dll\ServiceStack.Redis.3.9.60\ServiceStack.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text, Version=4.0.50.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Danny.Lib.dll\ServiceStack.Redis.3.9.60\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\..\Danny.Lib.dll\sqlite-x64-net4.0-1.0.99\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Cacheing\Enums\DirectoryOption.cs" />
+    <Compile Include="Common\CheckCode.cs" />
+    <Compile Include="Common\DateAndTime.cs" />
+    <Compile Include="Common\ImageUtility.cs" />
+    <Compile Include="Cacheing\GLCacheExpiration.cs" />
+    <Compile Include="Cacheing\MemoryCacheManager.cs" />
+    <Compile Include="Cacheing\RedisCacheExpiration.cs" />
+    <Compile Include="Cacheing\SqlCacheExpiration.cs" />
+    <Compile Include="Cacheing\Enums\SqlCacheOption.cs" />
+    <Compile Include="Common\AesFactory.cs" />
+    <Compile Include="Common\UnCodebase.cs" />
+    <Compile Include="Converter\Json\BooleanConverter.cs" />
+    <Compile Include="Converter\Json\DateTimeConverter.cs" />
+    <Compile Include="Converter\Json\LimitPropertyContractResolver.cs" />
+    <Compile Include="Common\FileHelper.cs" />
+    <Compile Include="Common\PagedList.cs" />
+    <Compile Include="Common\Utilities.cs" />
+    <Compile Include="Enums\ActionType.cs" />
+    <Compile Include="Helpers\Mssql\MssqlGetSomeOne.cs" />
+    <Compile Include="Helpers\Mssql\MssqlQueryHelper.cs" />
+    <Compile Include="Web\CookieConvert.cs" />
+    <Compile Include="Web\Routes\DynamicHelper.cs" />
+    <Compile Include="Web\Routes\WebRoute.cs" />
+    <Compile Include="Web\Routes\WebRouteHandler.cs" />
+    <Compile Include="Web\WebResponseData.cs" />
+    <Compile Include="Web\WebHelper.cs" />
+    <Compile Include="Web\WebCommon.cs" />
+    <Compile Include="Web\WebParams.cs" />
+    <Compile Include="Xml\PListXml\IPListNode.cs" />
+    <Compile Include="Xml\PListXml\PListArray.cs" />
+    <Compile Include="Xml\PListXml\PListCollection.cs" />
+    <Compile Include="Xml\PListXml\PListDict.cs" />
+    <Compile Include="Xml\PListXml\NodeValueType.cs" />
+    <Compile Include="Xml\XmlParser.cs" />
+    <Compile Include="Enums\EnumExtension.cs" />
+    <Compile Include="Enums\JsonFilterOption.cs" />
+    <Compile Include="Enums\SQLExpression.cs" />
+    <Compile Include="Extension\TypeExtension.cs" />
+    <Compile Include="Helpers\SQLDataBaseType.cs" />
+    <Compile Include="Enums\SQLOption.cs" />
+    <Compile Include="Helpers\SQLCondition.cs" />
+    <Compile Include="Helpers\Mssql\MssqlCustomCmd.cs" />
+    <Compile Include="Helpers\Mssql\MssqlDelete.cs" />
+    <Compile Include="Helpers\SQLEntityKey.cs" />
+    <Compile Include="Enums\TranSactionState.cs" />
+    <Compile Include="Helpers\SQLIDataSave.cs" />
+    <Compile Include="Helpers\SQLContext.cs" />
+    <Compile Include="Helpers\Mssql\MssqlInsert.cs" />
+    <Compile Include="Helpers\SQLParameter.cs" />
+    <Compile Include="Helpers\Mssql\MssqlReadPager.cs" />
+    <Compile Include="Helpers\Mssql\MssqlUpdate.cs" />
+    <Compile Include="Helpers\SQLDataResult.cs" />
+    <Compile Include="Logs\LogManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Xml\XmlDict.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Helpers\SQLHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 和 x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Helpers\SQLite\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

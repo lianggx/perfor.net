@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 14.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25029.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perfor.Lib", "Perfor.Lib\Perfor.Lib.csproj", "{C7698B2D-0B92-480D-A56A-DC27BBA51040}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perfor.Forms.Test", "Perfor.Forms.Test\Perfor.Forms.Test.csproj", "{7F8E1F4F-3DAA-4AFC-AAC0-80BA90D2BEED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perfor.Authority", "Perfor.Authority\Perfor.Authority.csproj", "{EC8DE435-30FA-47FF-92F4-684F28C1A081}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C7698B2D-0B92-480D-A56A-DC27BBA51040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7698B2D-0B92-480D-A56A-DC27BBA51040}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7698B2D-0B92-480D-A56A-DC27BBA51040}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7698B2D-0B92-480D-A56A-DC27BBA51040}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F8E1F4F-3DAA-4AFC-AAC0-80BA90D2BEED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F8E1F4F-3DAA-4AFC-AAC0-80BA90D2BEED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F8E1F4F-3DAA-4AFC-AAC0-80BA90D2BEED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F8E1F4F-3DAA-4AFC-AAC0-80BA90D2BEED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC8DE435-30FA-47FF-92F4-684F28C1A081}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC8DE435-30FA-47FF-92F4-684F28C1A081}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC8DE435-30FA-47FF-92F4-684F28C1A081}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC8DE435-30FA-47FF-92F4-684F28C1A081}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
