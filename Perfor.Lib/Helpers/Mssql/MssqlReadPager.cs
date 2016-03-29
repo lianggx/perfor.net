@@ -8,6 +8,7 @@ using System.Data.Common;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using Perfor.Lib.Reflection;
 
 namespace Perfor.Lib.Helpers.Mssql
 {
@@ -68,8 +69,12 @@ namespace Perfor.Lib.Helpers.Mssql
             for (int i = 0; i < piArray.Length; i++)
             {
                 fields[i] = piArray[i].Name;
+                if (CheckPrimaryKey(piArray[i]))
+                {
+                    PrimaryKey = fields[i];
+                }
             }
-
+            TableName = type.Name;
             dataList = Select<T>(fields, "", page, size, out rowCount);
 
             return dataList;

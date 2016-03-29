@@ -6,6 +6,7 @@ using Perfor.Lib.Extension;
 using Perfor.Lib.Enums;
 using System.Data.Common;
 using System.Reflection;
+using Perfor.Lib.Reflection;
 
 namespace Perfor.Lib.Helpers.Mssql
 {
@@ -92,7 +93,6 @@ namespace Perfor.Lib.Helpers.Mssql
             {
                 if (reader == null || reader.HasRows == false)
                     return list;
-
                 do
                 {
                     SQLDataResult result = new SQLDataResult();
@@ -104,7 +104,6 @@ namespace Perfor.Lib.Helpers.Mssql
                     }
                     list.Add(result);
                 } while (reader.Read());
-
             }
             finally
             {
@@ -123,14 +122,23 @@ namespace Perfor.Lib.Helpers.Mssql
             List<T> dataList = new List<T>();
             if (reader == null)
                 return null;
+
             try
             {
+                DynamicManager<T> dm = new DynamicManager<T>();
+                dm.InitDynamicObject(reader);
+                do
+                {
+                    T returnObj = dm.CreateObject(reader);
+                    dataList.Add(returnObj);
+                } while (reader.Read());
+                /*
                 Type type = typeof(T);
                 if (TableName.IsNullOrEmpty())
                 {
                     TableName = type.Name;
-                }               
-               
+                }
+
                 int len = fields.Count();
                 List<string> queryName = new List<string>();
                 for (int i = 0; i < len; i++)
@@ -152,6 +160,7 @@ namespace Perfor.Lib.Helpers.Mssql
                     }
                     dataList.Add(result);
                 } while (Context.DbReader.Read());
+                 * */
             }
             finally
             {
@@ -184,7 +193,7 @@ namespace Perfor.Lib.Helpers.Mssql
                     defaultField = tableFields[okey];
                     string dire = orderValue[1];
 
-                    if (dire.IsEnum<SQLExpression.Order,string>())
+                    if (dire.IsEnum<SQLExpression.Order, string>())
                     {
                         defaultDirection = dire.ToEnum<SQLExpression.Order>();
                     }

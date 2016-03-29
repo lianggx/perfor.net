@@ -108,6 +108,7 @@
     <Compile Include="Enums\ActionType.cs" />
     <Compile Include="Helpers\Mssql\MssqlGetSomeOne.cs" />
     <Compile Include="Helpers\Mssql\MssqlQueryHelper.cs" />
+    <Compile Include="Reflection\DynamicManager.cs" />
     <Compile Include="Web\CookieConvert.cs" />
     <Compile Include="Web\Routes\DynamicHelper.cs" />
     <Compile Include="Web\Routes\WebRoute.cs" />
