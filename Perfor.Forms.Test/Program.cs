@@ -21,6 +21,8 @@ using System.Reflection;
 using System.Text;
 using System.Linq;
 using System.Configuration;
+using System.Net;
+using ServiceStack.Redis;
 
 namespace Perfor.Forms.Test
 {
@@ -33,64 +35,36 @@ namespace Perfor.Forms.Test
         private const int _250 = 250;
 
         /// <summary>
-        /// 应用程序的主入口点。
+        /// 应用程序的主入口点。k
         /// </summary>
         [STAThread]
         static void Main()
         {
-            byte[] crypt = System.Security.Cryptography.SHA256.Create().Hash;
-            string key = Convert.ToBase64String(crypt);
-            Console.WriteLine(key);
-            Console.ReadKey();
-            return;
-            string[] filters = { "ToString", "GetType", "Equals", "GetHashCode" };
-            IPListNode node = new PListDict();
-            node.FromXmlFile("config.plist");
-            IPListNode login = node["login"];
-            Console.WriteLine("username:{0},password:{1},host:{2}", login["username"].Value, login["password"].Value, login["host"].Value);
-            Console.ReadKey();
-            return;
-            Assembly assembly = Assembly.Load("Perfor.Lib");
-            Type[] modules = assembly.GetTypes();
-            List<AssemblyType> types = new List<AssemblyType>(modules.Length);
-            foreach (var item in modules)
-            {
-                if (item.Name != "SQLHelper") continue;
-                MethodInfo[] infos = item.GetMethods(BindingFlags.Public).Where(f => !f.IsSpecialName).ToArray();
+            //List<string> writeHost = new List<string>() { "127.0.0.1:6379" };
+            //List<string> readHost = new List<string>() { "127.0.0.1:6379" };
+            //RedisClientManagerConfig config = new RedisClientManagerConfig();
+            //config.AutoStart = true;
+            //config.DefaultDb = 1;
+            //config.MaxReadPoolSize = 100;
+            //config.MaxWritePoolSize = 100;
+            //RedisCacheExpiration redisCache = new RedisCacheExpiration(writeHost, readHost, config);
 
-                AssemblyType at = new AssemblyType();
-                at.Name = item.Name;
-                at.FullName = item.FullName;
-                at.Methods = new List<AssemblyMethod>(infos.Length);
-                types.Add(at);
-
-                foreach (var mi in infos)
-                {
-                    if (filters.Contains(f => f == mi.Name)) continue;
-                    Console.Write("Method:{0},ReturnType:{1}\nParameters:\n", mi.Name, mi.ReturnType.Name);
-                    ParameterInfo[] pi = mi.GetParameters();
-
-                    AssemblyMethod am = new AssemblyMethod();
-                    am.Name = mi.Name;
-                    am.ReturnType = mi.ReturnType.Name;
-                    am.Paramters = new List<AssemblyParamter>(pi.Length);
-                    at.Methods.Add(am);
-                    foreach (var p in pi)
-                    {
-                        Console.Write("{0}({1}),", p.Name, p.ParameterType.Name);
-
-                        AssemblyParamter ap = new AssemblyParamter();
-                        ap.Name = p.Name;
-                        ap.TypeName = p.ParameterType.Name;
-                        am.Paramters.Add(ap);
-
-                    }
-                    Console.WriteLine();
-                }
-                Console.WriteLine();
-            }
-            string json = JsonConvert.SerializeObject(types);
-            Console.WriteLine(json);
+            //for (int i = 0; i < 2; i++)
+            //{
+            //    Console.Write("{0},", i);
+            //    System.Threading.Thread thread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate ()
+            //    {
+            //        for (int j = 0; j < 3; j++)
+            //        {
+            //            redisCache.Set(Guid.NewGuid().ToString("N"), "lgx", DateTimeOffset.Now.AddMinutes(2));
+            //            Console.Write("{0},", j);
+            //        }
+            //        Console.WriteLine();
+            //    }));
+            //    thread.IsBackground = true;
+            //    thread.Start();
+            //    Console.WriteLine();
+            //}
             Console.ReadKey();
 
             //Application.EnableVisualStyles();
@@ -180,35 +154,36 @@ LEFT JOIN [dbo].[Goods] AS C ON B.G_ID=C.ID
 LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID
 WHERE D.ID='00000ddb92044fad8be0913b68697318'
              * */
-            MssqlReadPager read = new MssqlReadPager();
-            read.TableName = "OrderHeaders";
-            read.TableAlias = "A";
-            string[] fields = { "A.ID", "A.CreateTime", "A.Total", "B.Count", "C.Price", "C.Name", "D.UserName", "D.Phone", "D.ID AS Cus_ID" };
-            string leftJoin = @"LEFT JOIN [dbo].[OrderDetails] AS B ON A.ID=B.OH_ID
-LEFT JOIN [dbo].[Goods] AS C ON B.G_ID=C.ID
-LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
-            read.SetOrderBy("A.CreateTime", SQLExpression.Order.DESC);
-            //  read.SetGroupBy(fields);
-            read.AddWhere("D.ID", "00000ddb92044fad8be0913b68697318");
-            //read.AddBracketLeft();
-            //read.AddWhere("A.UserName", LdfSQLExpression.ExprOperator.Eq, "李进", LdfSQLExpression.JoinType.OR);
-            //read.AddWhere("A.UserName", "李进");
-            //read.AddBracketRight();
-            int rowCount = 0;
-            read.PrimaryKey = "ID";
-            IEnumerable<SQLDataResult> list = read.Select(fields, leftJoin, 1, 20, out rowCount);
-            foreach (var item in list)
-            {
-                Console.WriteLine("ID:{0}", item["ID"]);
-                Console.WriteLine("CreateTime:{0}", item["CreateTime"]);
-                Console.WriteLine("Total:{0}", item["Total"]);
-                Console.WriteLine("Count:{0}", item["Count"]);
-                Console.WriteLine("Price:{0}", item["Price"]);
-                Console.WriteLine("Name:{0}", item["Name"]);
-                Console.WriteLine("UserName:{0}", item["UserName"]);
-                Console.WriteLine("Phone:{0}", item["Phone"]);
-                Console.WriteLine("Cus_ID:{0}", item["Cus_ID"]);
-            }
+            /*     MssqlReadPager read = new MssqlReadPager();
+                 read.TableName = "OrderHeaders";
+                 read.TableAlias = "A";
+                 string[] fields = { "A.ID", "A.CreateTime", "A.Total", "B.Count", "C.Price", "C.Name", "D.UserName", "D.Phone", "D.ID AS Cus_ID" };
+                 string leftJoin = @"LEFT JOIN [dbo].[OrderDetails] AS B ON A.ID=B.OH_ID
+     LEFT JOIN [dbo].[Goods] AS C ON B.G_ID=C.ID
+     LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
+                 read.SetOrderBy("A.CreateTime", SQLExpression.Order.DESC);
+                 //  read.SetGroupBy(fields);
+                 read.AddWhere("D.ID", "00000ddb92044fad8be0913b68697318");
+                 //read.AddBracketLeft();
+                 //read.AddWhere("A.UserName", LdfSQLExpression.ExprOperator.Eq, "李进", LdfSQLExpression.JoinType.OR);
+                 //read.AddWhere("A.UserName", "李进");
+                 //read.AddBracketRight();
+                 int rowCount = 0;
+                 read.PrimaryKey = "ID";
+                 IEnumerable<SQLDataResult> list = read.Select<OrderHeaders>(fields, leftJoin, 1, 20, out rowCount);
+                 foreach (var item in list)
+                 {
+                     Console.WriteLine("ID:{0}", item["ID"]);
+                     Console.WriteLine("CreateTime:{0}", item["CreateTime"]);
+                     Console.WriteLine("Total:{0}", item["Total"]);
+                     Console.WriteLine("Count:{0}", item["Count"]);
+                     Console.WriteLine("Price:{0}", item["Price"]);
+                     Console.WriteLine("Name:{0}", item["Name"]);
+                     Console.WriteLine("UserName:{0}", item["UserName"]);
+                     Console.WriteLine("Phone:{0}", item["Phone"]);
+                     Console.WriteLine("Cus_ID:{0}", item["Cus_ID"]);
+                 }
+             * */
             /*
                        // 单表查询
                        LdfSQLReadPager read = new LdfSQLReadPager();
@@ -221,13 +196,14 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
                        //read.AddWhere("UserName", "李进");
                        IEnumerable<Customers> list = read.Select<Customers>("ID", fields, leftJoin, 1, 20); 
              */
-            //MssqlReadPager read = new MssqlReadPager();
-            //int rowCount = 0;
-            //List<Customers> list = read.Select<Customers>(1, 20, out rowCount);
-            //foreach (var item in list)
-            //{
-            //    Console.WriteLine("{0}：{1}", item.ID, item.UserName);
-            //}
+            MssqlReadPager read = new MssqlReadPager();
+            int rowCount = 0;
+            read.SetOrderBy("ID");
+            List<Customers> list = read.Select<Customers>(1, 20, out rowCount);
+            foreach (var item in list)
+            {
+                Console.WriteLine("{0}：{1}", item.ID, item.UserName);
+            }
         }
 
         static void CustomCmdTest()
@@ -368,12 +344,10 @@ LEFT JOIN [dbo].[Customers] AS D ON A.Cus_ID=D.ID ";
             for (int i = 0; i < 10; i++)
             {
                 Customers cus = new Customers();
-                cus.Enabled = true;
                 cus.Gender = 1;
                 cus.ID = Guid.NewGuid().ToString("N");
                 cus.LastModifyTime = DateTime.Now.AddDays(10);
                 cus.Phone = "13800138000";
-                cus.SQLOption = SQLOption.CREATE;
                 cus.UserName = "李小唐";
                 list.Add(cus);
             }

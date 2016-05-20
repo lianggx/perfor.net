@@ -252,51 +252,55 @@ namespace Perfor.Lib.Extension
 
         public static byte[] ToBytes(this string value)
         {
+            if (string.IsNullOrEmpty(value))
+                return null;
             return Encoding.UTF8.GetBytes(value);
         }
 
-        public static int ToShortInt(this string value)
+        public static int ToShortInt(this string str)
         {
-            Int16 val = 0;
-            try
-            {
-                val = Convert.ToInt16(value);
-            }
-            catch { }
-            return val;
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
+            Regex regex = new Regex(@"\d[0-9]");
+            if (regex.IsMatch(str))
+                return Convert.ToInt16(str);
+
+            return 0;
         }
 
         public static int ToInt(this string str)
         {
-            int val = 0;
-            try
-            {
-                val = Convert.ToInt32(str);
-            }
-            catch { }
-            return val;
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
+            Regex regex = new Regex(@"\d[0-9]");
+            if (regex.IsMatch(str))
+                return Convert.ToInt32(str);
+
+            return 0;
         }
 
         public static long ToLong(this string str)
         {
-            long val = 0;
-            try
-            {
-                val = Convert.ToInt64(str);
-            }
-            catch { }
-            return val;
+            if (string.IsNullOrEmpty(str))
+                return 0;
+            Regex regex = new Regex(@"\d[0-9]");
+            if (regex.IsMatch(str))
+                return Convert.ToInt64(str);
+
+            return 0;
         }
 
         public static decimal ToDecimal(this string str)
         {
-            decimal val = 0;
-            try
-            {
-                val = Convert.ToDecimal(str);
-            }
-            catch { }
-            return val;
+            if (string.IsNullOrEmpty(str))
+                return 0;
+            Regex regex = new Regex(@"[0-9]\d*[\.]?\d*|-0\.\d*[0-9]\d*$");
+            if (regex.IsMatch(str))
+                return Convert.ToDecimal(str);
+
+            return 0;
         }
 
         public static Guid ToGuid(this string str)
@@ -312,29 +316,26 @@ namespace Perfor.Lib.Extension
 
         public static double ToDouble(this string str)
         {
-            double val = 0d;
-            try
-            {
-                val = Convert.ToDouble(str);
-            }
-            catch { }
-            return val;
+            if (string.IsNullOrEmpty(str))
+                return 0;
+            Regex regex = new Regex(@"[0-9]\d*[\.]?\d*|-0\.\d*[0-9]\d*$");
+            if (regex.IsMatch(str))
+                return Convert.ToDouble(str);
+
+            return 0;
         }
 
         public static double ToFloat(this string str)
         {
-            float val = 0f;
-            try
-            {
-                val = (float)Convert.ToDecimal(str);
-            }
-            catch { }
-            return val;
+            return (float)ToDecimal(str);
         }
 
         public static DateTime ToDateTime(this string str)
         {
             DateTime val = DateTime.Parse("1970-1-1");
+            if (string.IsNullOrEmpty(str))
+                return val;
+
             try
             {
                 val = Convert.ToDateTime(str);
@@ -356,13 +357,20 @@ namespace Perfor.Lib.Extension
 
         public static bool ToBoolean(this string str)
         {
-            bool val = false;
-            try
+            if (string.IsNullOrEmpty(str))
+                return false;
+
+            Regex regex = new Regex(@"[0-9]\d*[\.]?\d*|-0\.\d*[0-9]\d*$");
+            if (regex.IsMatch(str))
             {
-                val = Convert.ToBoolean(str);
+                return Convert.ToInt64(str) > 0;
             }
-            catch { }
-            return val;
+            regex = new Regex(@"true|false");
+            if (regex.IsMatch(str.ToLower()))
+            {
+                return Convert.ToBoolean(str);
+            }
+            return false;
         }
 
         public static string ToEllipsis(this string value, int length, string spl = "...")

@@ -98,19 +98,15 @@ namespace Perfor.Lib.Logs
                     using (FileStream fs = new FileStream(path, FileMode.Append, FileAccess.Write))
                     {
                         StreamWriter sw = new StreamWriter(fs);
-                        sw.WriteLine(DateTime.Now.ToString());
-                        sw.WriteLine(text);
+                        sw.WriteLine(DateTime.Now.ToString() + " " + text);
                         if (ex != null)
                         {
-                            sw.WriteLine(ex.Message);
-                            sw.WriteLine(ex.StackTrace);
+                            sw.WriteLine(ex.Message + " " + ex.StackTrace);
                             if (ex.InnerException != null)
                             {
                                 sw.WriteLine(ex.InnerException.StackTrace);
                             }
                         }
-                        sw.WriteLine("------------------------------------------------------------------------------------------");
-                        sw.WriteLine();
                         sw.Flush();
                         fs.Flush();
                     }

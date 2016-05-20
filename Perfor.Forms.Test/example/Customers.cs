@@ -23,8 +23,8 @@ namespace Perfor.Forms.Test.example
         public string Phone { get; set; }
         [JsonProperty(PropertyName = "time")]
         public DateTime LastModifyTime { get; set; }
-        [JsonProperty(PropertyName = "islock")]
-        public bool Enabled { get; set; }
-        public SQLOption SQLOption { get; set; }
+        //[JsonProperty(PropertyName = "islock")]
+        //public bool Enabled { get; set; }
+        //public SQLOption SQLOption { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using System.Text;
 using ServiceStack.Redis;
 using ServiceStack.Redis.Generic;
 using Perfor.Lib.Extension;
+using ServiceStack.CacheAccess;
 
 namespace Perfor.Lib.Cacheing
 {
@@ -21,19 +22,23 @@ namespace Perfor.Lib.Cacheing
          * @ writeHost 写入数据主机列表
          * @ readHost 读取数据主机列表
          * @ config 连接池的配置
+         * @ initalDb 默认连接的数据库，如果config没有指定defaultDb，initalDb 默认为 0，有可能连接不上
+         * @ poolSizeMultiplier pool大小的跨度 ，计算公式：db * multiplier，如10个数据库，mutiplier为2，则最终pool的大小为：10*2
+         * @ poolTimeOutSeconds pool超时时间 ，秒
          * */
-        public RedisCacheExpiration(IEnumerable<string> writeHost, IEnumerable<string> readHost, RedisClientManagerConfig config = null)
+        public RedisCacheExpiration(IEnumerable<string> writeHost, IEnumerable<string> readHost, RedisClientManagerConfig config = null, int initalDb = 0, int? poolSizeMultiplier = 10, int? poolTimeOutSeconds = 2)
         {
             if (writeHost.IsNullOrEmpty() || readHost.IsNullOrEmpty())
                 throw new ArgumentNullException("必须指定参数：writeHost和readHost的值");
             if (config == null)
             {
                 config = new RedisClientManagerConfig();
-                config.AutoStart = true;
-                config.MaxReadPoolSize = 60;
-                config.MaxWritePoolSize = 60;
             }
-            redisPool = new PooledRedisClientManager(writeHost, readHost, config);
+            redisPool = new PooledRedisClientManager(writeHost, readHost, config, initalDb, poolSizeMultiplier, poolTimeOutSeconds);
+            if (!config.AutoStart)
+            {
+                redisPool.Start();
+            }
         }
         #endregion
 
@@ -235,6 +240,7 @@ namespace Perfor.Lib.Cacheing
         #endregion
 
         #region Properties        
+        private object lockObjectRead = new object();
         private IRedisClient defaultReadClient = null;
 
         /**
@@ -253,6 +259,7 @@ namespace Perfor.Lib.Cacheing
             }
         }
 
+        private object lockObjectWrite = new object();
         private IRedisClient defaultWriteClient = null;
 
         /**
@@ -262,11 +269,13 @@ namespace Perfor.Lib.Cacheing
         {
             get
             {
-                if (defaultWriteClient == null)
+                lock (lockObjectWrite)
                 {
-                    defaultWriteClient = redisPool.GetClient();
+                    if (defaultWriteClient == null)
+                    {
+                        defaultWriteClient = redisPool.GetClient();
+                    }
                 }
-
                 return defaultWriteClient;
             }
         }

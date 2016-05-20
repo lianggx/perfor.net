@@ -63,7 +63,7 @@ namespace Perfor.Lib.Web
          * */
         private void AddParams(NameValueCollection collections)
         {
-            if (collections == null || collections.Count == 0)
+            if (collections == null || collections.Count == 0 || collections.AllKeys.IsNullOrEmpty())
                 return;
 
             foreach (var key in collections.AllKeys)
@@ -72,7 +72,7 @@ namespace Perfor.Lib.Web
                 if (this.ContainsKey(k))
                     continue;
 
-                string valueStr = collections[k];
+                string valueStr = HttpContext.Current.Server.UrlDecode(collections[k]);
                 this.Add(k, valueStr);
             }
         }

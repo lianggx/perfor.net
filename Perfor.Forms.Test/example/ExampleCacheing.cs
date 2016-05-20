@@ -126,7 +126,7 @@ namespace Perfor.Forms.Test.example
         {
             Console.WriteLine("From SQL");
             DateTimeOffset dtOffset = new DateTimeOffset(DateTime.Now.AddHours(3));
-            string sqlCmd = "SELECT ID,Name,Gender,Phone FROM dbo.Customer WHERE ID='B0AA40CF8B604F64AE57E55384A455E3'";
+            string sqlCmd = "SELECT ID,UserName,Gender,Phone FROM dbo.Customers WHERE ID='00000ddb92044fad8be0913b68697318'";
             CacheItem cacheItem = GLCacheExpiration.CreateSQLCache<Customers>("cus", dbConnectionString, sqlCmd, dtOffset, onSingleSourceChange, SqlCacheOption.Single);
 
             return cacheItem;

@@ -113,6 +113,7 @@
     <Compile Include="Web\Routes\DynamicHelper.cs" />
     <Compile Include="Web\Routes\WebRoute.cs" />
     <Compile Include="Web\Routes\WebRouteHandler.cs" />
+    <Compile Include="Web\WebFileEnumerator.cs" />
     <Compile Include="Web\WebResponseData.cs" />
     <Compile Include="Web\WebHelper.cs" />
     <Compile Include="Web\WebCommon.cs" />

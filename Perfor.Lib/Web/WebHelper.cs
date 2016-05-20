@@ -1,4 +1,5 @@
 ﻿using Perfor.Lib.Enums;
+using Perfor.Lib.Extension;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,7 +22,7 @@ namespace Perfor.Lib.Web
         private static bool keepalive = true;
         private static bool allowautoredirect = true;
         private static DecompressionMethods automaticdecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-        private static string contenttype = "application/x-www-form-urlencoded;charset=utf8";
+        private static string contenttype = "application/x-www-form-urlencoded";
         private static string useragent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36";
         public WebHelper() { }
         #endregion
@@ -104,29 +105,45 @@ namespace Perfor.Lib.Web
         public WebResponseData GetResponse(HttpWebRequest request, bool catchCookie = true, bool catchHtml = true)
         {
             WebResponseData rd = new WebResponseData();
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            {
-                Stream responseStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(responseStream);
-                if (catchHtml)
-                    rd.Html = reader.ReadToEnd();
-                rd.Headers = new Dictionary<string, string>();
-                foreach (var k in response.Headers.AllKeys)
-                {
-                    rd.Headers.Add(k, response.Headers[k]);
-                }
-                rd.Url = response.ResponseUri;
-                rd.SetCookieString = response.Headers.Get("Set-Cookie");
-                if (catchCookie)
-                {
-                    rd.Cookies = new CookieCollection();
-                    for (int i = 0; i < response.Cookies.Count; i++)
-                    {
-                        rd.Cookies.Add(response.Cookies[i]);
-                    }
-                }
 
+            HttpWebResponse response = null;
+            try
+            {
+                response = (HttpWebResponse)request.GetResponse();
+                rd.Status = response.StatusCode.ToInt();
             }
+            catch (WebException ex)
+            {
+                rd.Status = ex.Status.ToInt();
+                response = (HttpWebResponse)ex.Response;
+                if (response != null)
+                {
+                    rd.Html = ex.Message;
+                }
+                return rd;
+            }
+
+            Stream responseStream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(responseStream);
+            if (catchHtml)
+                rd.Html = reader.ReadToEnd();
+            rd.Headers = new Dictionary<string, string>();
+            foreach (var k in response.Headers.AllKeys)
+            {
+                rd.Headers.Add(k, response.Headers[k]);
+            }
+            rd.Url = response.ResponseUri;
+            rd.SetCookieString = response.Headers.Get("Set-Cookie");
+            if (catchCookie)
+            {
+                rd.Cookies = new CookieCollection();
+                for (int i = 0; i < response.Cookies.Count; i++)
+                {
+                    rd.Cookies.Add(response.Cookies[i]);
+                }
+            }
+
+            response.Close();
 
             return rd;
         }
