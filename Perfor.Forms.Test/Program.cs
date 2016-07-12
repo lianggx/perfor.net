@@ -23,16 +23,13 @@ using System.Linq;
 using System.Configuration;
 using System.Net;
 using ServiceStack.Redis;
+using System.Collections.Specialized;
+using System.Text.RegularExpressions;
 
 namespace Perfor.Forms.Test
 {
     static class Program
     {
-        public static string GetUserName(string name, int age)
-        {
-            return string.Empty;
-        }
-        private const int _250 = 250;
 
         /// <summary>
         /// 应用程序的主入口点。k
@@ -40,31 +37,7 @@ namespace Perfor.Forms.Test
         [STAThread]
         static void Main()
         {
-            //List<string> writeHost = new List<string>() { "127.0.0.1:6379" };
-            //List<string> readHost = new List<string>() { "127.0.0.1:6379" };
-            //RedisClientManagerConfig config = new RedisClientManagerConfig();
-            //config.AutoStart = true;
-            //config.DefaultDb = 1;
-            //config.MaxReadPoolSize = 100;
-            //config.MaxWritePoolSize = 100;
-            //RedisCacheExpiration redisCache = new RedisCacheExpiration(writeHost, readHost, config);
 
-            //for (int i = 0; i < 2; i++)
-            //{
-            //    Console.Write("{0},", i);
-            //    System.Threading.Thread thread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate ()
-            //    {
-            //        for (int j = 0; j < 3; j++)
-            //        {
-            //            redisCache.Set(Guid.NewGuid().ToString("N"), "lgx", DateTimeOffset.Now.AddMinutes(2));
-            //            Console.Write("{0},", j);
-            //        }
-            //        Console.WriteLine();
-            //    }));
-            //    thread.IsBackground = true;
-            //    thread.Start();
-            //    Console.WriteLine();
-            //}
             Console.ReadKey();
 
             //Application.EnableVisualStyles();
@@ -220,10 +193,16 @@ WHERE D.ID='00000ddb92044fad8be0913b68697318'
          * */
         static void RedisCacheTest()
         {
-            List<string> writeHost = new List<string>() { "123456@127.0.0.1:9706" };
-            List<string> readHost = new List<string>() { "123456@127.0.0.1:9706" };
-            RedisCacheExpiration redisCache = new RedisCacheExpiration(writeHost, readHost);
-            redisCache.Set("userid", "lgx", DateTime.Now.AddDays(2));
+            List<string> writeHost = new List<string>() { "127.0.0.1:6379" };
+            List<string> readHost = new List<string>() { "127.0.0.1:6379" };
+            RedisCacheExpiration redisCache = new RedisCacheExpiration(writeHost, readHost, null);
+            //  redisCache.Set("userid", "lgx", DateTime.Now.AddDays(2));
+            DateTime dt = DateTime.Now;
+            DateTime today = DateTime.Today.AddDays(1).AddMilliseconds(-1);
+            TimeSpan div = today - dt;
+            redisCache.AddItemToList("abc", "abc");
+            redisCache.ExpireEntryIn("abc", div);
+            long count = redisCache.GetListCount("abc");
         }
 
         /***
@@ -299,6 +278,7 @@ WHERE D.ID='00000ddb92044fad8be0913b68697318'
             ht["array"] = array;
 
             string result = ht.ToXmlString();
+            Console.WriteLine(result);
             PListDict node = new PListDict();
             node.FromXmlString(result);
             string nodestr = node.ToJson();

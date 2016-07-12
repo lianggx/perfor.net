@@ -13,6 +13,7 @@ using Perfor.Lib.Common;
 
 namespace Perfor.Lib.Helpers
 {
+    [Serializable]
     /**
      *  @ 数据操作基类
      * */
@@ -125,7 +126,7 @@ namespace Perfor.Lib.Helpers
           * @ fields 要插入的字段名称
           * @ values 字段对应的值 
           * */
-        protected bool AddObject<T>(T obj, SQLOption option = SQLOption.NORMAL) where T : class,new()
+        protected bool AddObject<T>(T obj, SQLOption option = SQLOption.NORMAL) where T : class, new()
         {
             if (obj == null)
                 throw new ArgumentNullException("obj对象不能为空");
@@ -229,9 +230,9 @@ namespace Perfor.Lib.Helpers
          * @ field 字段名称
          * @ value 值，支持空值
          * */
-        public void AddWhere(string field, object value)
+        public SQLHelper AddWhere(string field, object value)
         {
-            AddWhere(field, SQLExpression.ExprOperator.Eq, value);
+            return AddWhere(field, SQLExpression.ExprOperator.Eq, value);
         }
 
         /**
@@ -240,10 +241,11 @@ namespace Perfor.Lib.Helpers
         * @ expr 运算符
         * @ value 值，支持空值
         * */
-        public void AddWhere(string field, SQLExpression.ExprOperator expr, object value)
+        public SQLHelper AddWhere(string field, SQLExpression.ExprOperator expr, object value)
         {
             SQLCondition lsc = new SQLCondition(field, value, expr);
             Conditions.Add(lsc);
+            return this;
         }
 
         /**
@@ -253,9 +255,11 @@ namespace Perfor.Lib.Helpers
       * @ value 值，支持空值
       * @ joinType 连接上一个条件的运算位
       * */
-        public void AddWhere(string field, SQLExpression.ExprOperator expr, object value, SQLExpression.JoinType joinType)
+        public SQLHelper AddWhere(string field, SQLExpression.ExprOperator expr, object value, SQLExpression.JoinType joinType)
         {
             Conditions.Add(new SQLCondition(field, value, expr, joinType));
+
+            return this;
         }
 
         /**

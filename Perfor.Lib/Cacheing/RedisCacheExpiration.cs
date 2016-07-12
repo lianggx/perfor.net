@@ -87,7 +87,12 @@ namespace Perfor.Lib.Cacheing
          * */
         public override bool Contains(string key, string regionName = null)
         {
-            return ReadClient.ContainsKey(key);
+            bool succeed = false;
+            using (IRedisClient client = redisPool.GetReadOnlyClient())
+            {
+                succeed = client.ContainsKey(key);
+            }
+            return succeed;
         }
 
         /**
@@ -116,7 +121,12 @@ namespace Perfor.Lib.Cacheing
          * */
         public override object Get(string key, string regionName = null)
         {
-            return ReadClient.Get<object>(key);
+            object val = null;
+            using (IRedisClient client = redisPool.GetReadOnlyClient())
+            {
+                val = client.Get<object>(key);
+            }
+            return val;
         }
 
         /**
@@ -137,7 +147,12 @@ namespace Perfor.Lib.Cacheing
          * */
         public override long GetCount(string regionName = null)
         {
-            return ReadClient.RetryCount;
+            int retryCount = 0;
+            using (IRedisClient client = redisPool.GetReadOnlyClient())
+            {
+                retryCount = client.RetryCount;
+            }
+            return retryCount;
         }
 
         /**
@@ -158,13 +173,14 @@ namespace Perfor.Lib.Cacheing
             if (keys.IsNullOrEmpty())
                 return null;
             IDictionary<string, object> dict = new Dictionary<string, object>();
-
-            foreach (var key in keys)
+            using (IRedisClient client = redisPool.GetReadOnlyClient())
             {
-                object val = ReadClient.Get<object>(key);
-                dict.Add(key, val);
+                foreach (var key in keys)
+                {
+                    object val = client.Get<object>(key);
+                    dict.Add(key, val);
+                }
             }
-
             return dict;
         }
 
@@ -182,7 +198,12 @@ namespace Perfor.Lib.Cacheing
          * */
         public override object Remove(string key, string regionName = null)
         {
-            return WriteClient.Remove(key);
+            object val = null;
+            using (IRedisClient client = redisPool.GetClient())
+            {
+                val = client.Remove(key);
+            }
+            return val;
         }
 
         /**
@@ -205,8 +226,13 @@ namespace Perfor.Lib.Cacheing
        * */
         public override void Set(CacheItem item, CacheItemPolicy policy)
         {
-            TimeSpan expir = policy.AbsoluteExpiration.Equals(null) ? policy.SlidingExpiration : policy.AbsoluteExpiration - DateTime.Now;
-            WriteClient.Set(item.Key, item.Value, expir);
+            using (IRedisClient client = redisPool.GetClient())
+            {
+                if (policy == null || policy.AbsoluteExpiration.Equals(null))
+                    client.Set(item.Key, item.Value);
+                else
+                    client.Set(item.Key, item.Value, policy.AbsoluteExpiration.DateTime);
+            }
         }
 
         /**
@@ -239,44 +265,62 @@ namespace Perfor.Lib.Cacheing
         }
         #endregion
 
-        #region Properties        
-        private object lockObjectRead = new object();
-        private IRedisClient defaultReadClient = null;
-
-        /**
-         * @ 默认读数据客户端的实例
-         * */
-        public IRedisClient ReadClient
+        #region Method self
+        /// <summary>
+        ///  添加指定的值到有序列表中
+        /// </summary>
+        /// <param name="listId"></param>
+        /// <param name="value"></param>
+        public void AddItemToList(string listId, string value)
         {
-            get
+            using (IRedisClient client = redisPool.GetClient())
             {
-                if (defaultReadClient == null)
-                {
-                    defaultReadClient = redisPool.GetReadOnlyClient();
-                }
-
-                return defaultReadClient;
+                client.AddItemToList(listId, value);
             }
         }
 
-        private object lockObjectWrite = new object();
-        private IRedisClient defaultWriteClient = null;
+        /// <summary>
+        ///  获取有序列表的值的数量
+        /// </summary>
+        /// <param name="listId"></param>
+        /// <returns></returns>
+        public long GetListCount(string listId)
+        {
+            long count = 0;
+            using (IRedisClient client = redisPool.GetReadOnlyClient())
+            {
+                count = client.GetListCount(listId);
+            }
+            return count;
+        }
+
+        /// <summary>
+        ///  设置指定key的过期时间
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="expireIn"></param>
+        public bool ExpireEntryIn(string key, TimeSpan expireIn)
+        {
+            bool succeed = false;
+            using (IRedisClient client = redisPool.GetClient())
+            {
+                succeed = client.ExpireEntryIn(key, expireIn);
+            }
+
+            return succeed;
+        }
+        #endregion
+
+        #region Properties        
 
         /**
-         * @ 默认写数据的客户端
+         * @ 默认连接池的实例
          * */
-        public IRedisClient WriteClient
+        public PooledRedisClientManager ReadPool
         {
             get
             {
-                lock (lockObjectWrite)
-                {
-                    if (defaultWriteClient == null)
-                    {
-                        defaultWriteClient = redisPool.GetClient();
-                    }
-                }
-                return defaultWriteClient;
+                return redisPool;
             }
         }
         #endregion

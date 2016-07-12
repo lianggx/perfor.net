@@ -68,6 +68,7 @@ namespace Perfor.Lib.Web
 
             foreach (var key in collections.AllKeys)
             {
+                if (key == null) continue;
                 string k = key.ToLower().Trim();
                 if (this.ContainsKey(k))
                     continue;

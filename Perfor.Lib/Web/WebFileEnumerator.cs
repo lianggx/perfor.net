@@ -81,9 +81,10 @@ namespace Perfor.Lib.Web
                 string[] dirs = Directory.GetDirectories(path);
                 if (dirs != null)
                 {
-                    for (int i = 0; i < dirs.Length; i++)
+                    IOrderedEnumerable<string> orderDirs = dirs.OrderByDescending(f => f);
+                    foreach (var item in orderDirs)
                     {
-                        DirectoryInfo di = new DirectoryInfo(dirs[i]);
+                        DirectoryInfo di = new DirectoryInfo(item);
                         string dirName = string.Format("{0}/{1}", sourcePath, di.Name);
                         list.Add(new FileEntityInfo() { Path = dirName, Level = level + 1, IsFile = false, Name = di.Name });
                     }
@@ -92,9 +93,10 @@ namespace Perfor.Lib.Web
                 string[] files = Directory.GetFiles(path);
                 if (files != null)
                 {
-                    for (int i = 0; i < files.Length; i++)
+                    IOrderedEnumerable<string> orderFiles = files.OrderByDescending(f => f);
+                    foreach (var item in orderFiles)
                     {
-                        FileInfo fi = new FileInfo(files[i]);
+                        FileInfo fi = new FileInfo(item );
                         string fiPath = string.Format("{0}/{1}", sourcePath, fi.Name);
                         list.Add(new FileEntityInfo() { Path = fiPath, Level = level + 1, IsFile = true, Name = fi.Name });
                     }
@@ -135,7 +137,7 @@ namespace Perfor.Lib.Web
             Regex regex = new Regex("  ");
             // 显示文件
             string file = string.Format(@"{0}\{1}", filePah, sourcePath);
-            using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
+            using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 StreamReader sr = new StreamReader(fs, true);
                 string line = sr.ReadLine();

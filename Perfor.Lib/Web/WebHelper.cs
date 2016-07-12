@@ -116,10 +116,14 @@ namespace Perfor.Lib.Web
             {
                 rd.Status = ex.Status.ToInt();
                 response = (HttpWebResponse)ex.Response;
-                if (response != null)
+                if (response == null)
                 {
                     rd.Html = ex.Message;
+                    if (ex.InnerException != null)
+                        rd.Html = string.Format("{0},{1}", ex.Message, ex.InnerException.Message);
                 }
+                else
+                    rd.Html = new StreamReader(response.GetResponseStream()).ReadToEnd();
                 return rd;
             }
 
