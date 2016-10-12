@@ -126,7 +126,7 @@ namespace Perfor.Lib.Cacheing
          * */
         private List<T> SelectData<T>(string cmdText, out SqlDependency dency) where T : class, new()
         {
-            if (cmdText.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(cmdText))
             {
                 throw new ArgumentNullException("cmdText不能为空");
             }
@@ -194,7 +194,7 @@ namespace Perfor.Lib.Cacheing
             if (conn.State != System.Data.ConnectionState.Open)
                 conn.Open();
             dency = new SqlDependency(sqlCmd);
-            dency.OnChange += delegate(object sender, SqlNotificationEventArgs e)
+            dency.OnChange += delegate (object sender, SqlNotificationEventArgs e)
             {
                 if (e.Type == SqlNotificationType.Change && SourceChange != null)
                 {

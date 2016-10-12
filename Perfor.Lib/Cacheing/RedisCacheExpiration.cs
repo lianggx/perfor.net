@@ -265,7 +265,7 @@ namespace Perfor.Lib.Cacheing
         }
         #endregion
 
-        #region Method self
+        #region method self
         /// <summary>
         ///  添加指定的值到有序列表中
         /// </summary>
@@ -309,6 +309,75 @@ namespace Perfor.Lib.Cacheing
 
             return succeed;
         }
+
+        /// <summary>
+        ///  搜索 key
+        /// </summary>
+        /// <param name="patterm"></param>
+        /// <returns></returns>
+        public List<string> SearchKeys(string patterm)
+        {
+            List<string> keys = new List<string>();
+            using (IRedisClient client = redisPool.GetReadOnlyClient())
+            {
+                keys = client.SearchKeys(patterm);
+            }
+
+            return keys;
+        }
+
+        /// <summary>
+        ///  获取指定 key的剩余过期时间
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public TimeSpan GetTimeToLive(string key)
+        {
+            TimeSpan live = new TimeSpan();
+            using (IRedisClient client = redisPool.GetReadOnlyClient())
+            {
+                live = client.GetTimeToLive(key);
+            }
+
+            return live;
+        }
+
+        /// <summary>
+        ///  设置一个值，并指定过期时间
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="expiresIn"></param>
+        /// <returns></returns>
+        public bool Set(string key, object value, TimeSpan expiresIn)
+        {
+            bool succeed = false;
+            using (IRedisClient client = redisPool.GetClient())
+            {
+                succeed = client.Set(key, value, expiresIn);
+            }
+
+            return succeed;
+        }
+
+        /// <summary>
+        ///  设置一个值，并指定过期时间
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="expiresIn"></param>
+        /// <returns></returns>
+        public bool Set(string key, object value, DateTime expiresIn)
+        {
+            bool succeed = false;
+            using (IRedisClient client = redisPool.GetClient())
+            {
+                succeed = client.Set(key, value, expiresIn);
+            }
+
+            return succeed;
+        }
+
         #endregion
 
         #region Properties        

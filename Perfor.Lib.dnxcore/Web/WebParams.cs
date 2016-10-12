@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web;
 using System.Collections.Specialized;
 
 using Perfor.Lib.Extension;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.Http;
+using System.Net;
 
 namespace Perfor.Lib.Web
 {
     /**
      * @ 创建 Web参数包装对象
      * */
-    [Serializable]
     public class WebParams : Dictionary<string, object>, IDisposable
     {
         #region Identity
+        private HttpRequest request = null;
         /**
          * @ 析构函数，清理托管资源
          * */
@@ -25,20 +26,13 @@ namespace Perfor.Lib.Web
             Dispose(false);
         }
 
-        /**
-         * @ 序列化参数构造函数
-         * */
-        protected WebParams(SerializationInfo info, StreamingContext contex)
-            : base(info, contex)
-        {
-            InitParams();
-        }
 
         /**
          * @ 默认构造函数
          * */
-        public WebParams()
+        public WebParams(HttpRequest request)
         {
+            this.request = request;
             InitParams();
         }
         #endregion
@@ -48,32 +42,51 @@ namespace Perfor.Lib.Web
          * */
         private void InitParams()
         {
-            HttpContext context = HttpContext.Current;
-            if (context == null)
+            if (request == null)
                 return;
 
             // URL参数
-            AddParams(context.Request.QueryString);
+            AddParams(request.Query);
             // 表单提交参数
-            AddParams(context.Request.Form);
+            AddParams(request.Form);
         }
 
         /**
          * @ 添加参数
          * */
-        private void AddParams(NameValueCollection collections)
+        private void AddParams(IQueryCollection collections)
         {
-            if (collections == null || collections.Count == 0 || collections.AllKeys.IsNullOrEmpty())
+            if (collections == null || collections.Count == 0 || collections.Keys.IsNullOrEmpty())
                 return;
 
-            foreach (var key in collections.AllKeys)
+            foreach (var key in collections.Keys)
             {
                 if (key == null) continue;
                 string k = key.ToLower().Trim();
                 if (this.ContainsKey(k))
                     continue;
 
-                string valueStr = HttpContext.Current.Server.UrlDecode(collections[k]);
+                string valueStr = WebUtility.UrlDecode(collections[k]);
+                this.Add(k, valueStr);
+            }
+        }
+
+        /**
+         * @ 添加参数
+         * */
+        private void AddParams(IFormCollection collections)
+        {
+            if (collections == null || collections.Count == 0 || collections.Keys.IsNullOrEmpty())
+                return;
+
+            foreach (var key in collections.Keys)
+            {
+                if (key == null) continue;
+                string k = key.ToLower().Trim();
+                if (this.ContainsKey(k))
+                    continue;
+
+                string valueStr = WebUtility.UrlDecode(collections[k]);
                 this.Add(k, valueStr);
             }
         }
@@ -89,18 +102,15 @@ namespace Perfor.Lib.Web
         /**
          * @ 获取Action的参数
          * @ key 参数名称
-         * @ isHtmlEncode 是否进行 HtmlEncode
          * */
-        public string GetValue(string key, bool isHtmlEncode = false)
+        public string GetValue(string key)
         {
             if (!this.ContainsKey(key))
                 return null;
 
             object value = string.Empty;
             this.TryGetValue(key, out value);
-            string result = HttpUtility.UrlDecode(value.ToString());
-            if (isHtmlEncode)
-                result = HttpUtility.HtmlEncode(result);
+            string result = WebUtility.UrlDecode(value.ToString());
 
             return result;
         }

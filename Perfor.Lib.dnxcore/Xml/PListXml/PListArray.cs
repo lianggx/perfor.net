@@ -1,22 +1,18 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-using Perfor.Lib.Extension;
 using Perfor.Lib.Common;
-using System.Collections;
-using Newtonsoft.Json.Linq;
 
 namespace Perfor.Lib.Xml.PListXml
 {
     /**
      * @ plist格式的 array 包装类
      * */
-    [Serializable]
     public partial class PListArray : PListCollection, IList<IPListNode>
     {
         #region Identity
