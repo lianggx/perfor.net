@@ -249,8 +249,10 @@ namespace Perfor.Lib.Xml.PListXml
                     IList list = this.Value as IList;
                     plistNode = list[key.ObjToInt()] as IPListNode;
                 }
-                else
+                else if (properties.ContainsKey(key))
+                {
                     plistNode = properties[key];
+                }
 
                 return plistNode;
             }

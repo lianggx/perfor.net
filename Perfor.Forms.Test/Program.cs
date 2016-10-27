@@ -30,6 +30,8 @@ namespace Perfor.Forms.Test
 {
     static class Program
     {
+        private const string ENChar = "abcdefghjkmnpqrstuvwxyz";
+        private const string ENCharNumber = "23456789abcdefgh23456789jkmnpqrs23456789tuvwxyz";
 
         /// <summary>
         /// 应用程序的主入口点。k
@@ -37,6 +39,39 @@ namespace Perfor.Forms.Test
         [STAThread]
         static void Main()
         {
+            int codeLen = 4;
+            string code = string.Empty;
+            Random random = new Random();
+            CodeStyleType codestyle = CodeStyleType.Char | CodeStyleType.Number;
+            if (codestyle == CodeStyleType.Char)
+            {
+                for (int i = 0; i < codeLen; i++)
+                {
+                    int n = random.Next(ENChar.Length);
+                    // 将小写字母转换成大写字母
+                    code += ENChar[n];
+                }
+                code = code.ToUpper();
+            }
+            else if (codestyle == CodeStyleType.Zh_cn)
+            {
+                code = CodeRandom.GetRand_CN(4);
+            }
+            else if (codestyle == CodeStyleType.Number)
+            {
+                code += CodeRandom.GetRandom(0, 9, codeLen);
+            }
+            else if (codestyle == (CodeStyleType.Char | CodeStyleType.Number))
+            {
+                for (int i = 0; i < codeLen; i++)
+                {
+                    int n = random.Next(ENCharNumber.Length);
+                    // 将小写字母转换成大写字母
+                    code += ENCharNumber[n];
+                }
+                code = code.ToUpper();
+            }
+            Console.WriteLine(code);
 
             Console.ReadKey();
 
@@ -384,5 +419,24 @@ WHERE D.ID='00000ddb92044fad8be0913b68697318'
     {
         public string Name { get; set; }
         public string TypeName { get; set; }
+    }
+
+    /// <summary>
+    ///  验证码样式类型
+    /// </summary>
+    public enum CodeStyleType
+    {
+        /// <summary>
+        /// 英文字母
+        /// </summary>
+        Char = 1,
+        /// <summary>
+        ///  中文字符
+        /// </summary>
+        Zh_cn = 2,
+        /// <summary>
+        ///  数字
+        /// </summary>
+        Number = 4
     }
 }
