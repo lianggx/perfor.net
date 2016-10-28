@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace dywebsdk.Drawing
+namespace Perfor.Lib.Drawing
 {
     /// <summary>
     ///   验证码随机数

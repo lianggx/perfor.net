@@ -4,7 +4,7 @@ using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 using System.IO;
 
-namespace dywebsdk.Drawing
+namespace Perfor.Lib.Drawing
 {
     /// <summary>
     ///  水印图片的操作管理
@@ -18,7 +18,6 @@ namespace dywebsdk.Drawing
         /// <param name="waterPicture">水印图片文件名</param>
         /// <param name="alpha">透明度(0.1-1.0数值越小透明度越高)</param>
         /// <param name="position">位置</param>
-        /// <param name="PicturePath" >图片的路径</param>
         /// <returns>返回生成于指定文件夹下的水印文件名</returns>
         public static Bitmap DrawImage(string sourcePicture, string waterPicture, float alpha, ImagePosition position)
         {
@@ -220,7 +219,6 @@ namespace dywebsdk.Drawing
         /// <param name="waterWords">需要添加到图片上的文字</param>
         /// <param name="alpha">透明度</param>
         /// <param name="position">位置</param>
-        /// <param name="PicturePath">文件路径</param>
         /// <returns></returns>
         public static Bitmap DrawWords(string sourcePicture, string waterWords, float alpha, ImagePosition position)
         {

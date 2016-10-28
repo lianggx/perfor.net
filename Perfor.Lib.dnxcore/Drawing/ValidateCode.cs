@@ -4,7 +4,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 
-namespace dywebsdk.Drawing
+namespace Perfor.Lib.Drawing
 {
     /// <summary>
     ///  输出验证图片

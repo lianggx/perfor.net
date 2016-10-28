@@ -1,4 +1,4 @@
-﻿namespace dywebsdk.Drawing
+﻿namespace Perfor.Lib.Drawing
 {
     /// <summary>
     /// 水印图片位置

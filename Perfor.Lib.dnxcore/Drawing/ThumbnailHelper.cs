@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 
-namespace dywebsdk.Drawing
+namespace Perfor.Lib.Drawing
 {
     /// <summary>
     /// 图片功能类

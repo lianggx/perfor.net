@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace dywebsdk.Drawing
+namespace Perfor.Lib.Drawing
 {
     /// <summary>
     ///  验证码样式类型
