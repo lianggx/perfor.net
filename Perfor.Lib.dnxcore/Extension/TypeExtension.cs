@@ -196,7 +196,7 @@ namespace Perfor.Lib.Extension
             if (string.IsNullOrEmpty(str))
                 return 0;
 
-            Regex regex = new Regex(@"\d[0-9]");
+            Regex regex = new Regex(@"^[0-9]+$");
             if (regex.IsMatch(str))
                 return Convert.ToInt16(str);
 
@@ -208,7 +208,7 @@ namespace Perfor.Lib.Extension
             if (string.IsNullOrEmpty(str))
                 return 0;
 
-            Regex regex = new Regex(@"\d[0-9]");
+            Regex regex = new Regex(@"^[0-9]+$");
             if (regex.IsMatch(str))
                 return Convert.ToInt32(str);
 
@@ -219,7 +219,7 @@ namespace Perfor.Lib.Extension
         {
             if (string.IsNullOrEmpty(str))
                 return 0;
-            Regex regex = new Regex(@"\d[0-9]");
+            Regex regex = new Regex(@"^[0-9]+$");
             if (regex.IsMatch(str))
                 return Convert.ToInt64(str);
 

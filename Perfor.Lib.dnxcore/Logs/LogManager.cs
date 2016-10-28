@@ -14,21 +14,35 @@ namespace Perfor.Lib.Logs
     {
         #region Identity
         // 日志创建方式
-        private static string[] dateFormarts = { "yyyyMMdd", "yyyyMMdd HH", "yyyyMMdd HH.mm" };
-        public static LogRecordType logRecordType = LogRecordType.Day;
-        public static object RemoteLock = new object();
+        private string[] dateFormarts = { "yyyyMMdd", "yyyyMMdd HH", "yyyyMMdd HH.mm" };
+        public LogRecordType logRecordType = LogRecordType.Day;
+        public object RemoteLock = new object();
         // 日志路径，不指定则默认使用该路径
-        public static string LogPath = "Logs";
-        private static object LocalLockObj = new object();
+        private string logpath = string.Empty;
+        private object LocalLockObj = new object();
         // 提供异步写日志的支持
         private delegate void AsyncWrite(string text, LogType type, Exception ex, LogRecordType recordType);
         private delegate void AsyncWriteRemote(string url, string text, LogType type, Exception ex);
+        public LogManager(string logPath)
+        {
+            logpath = logPath;
+        }
         #endregion
+
+        /// <summary>
+        ///  创建日志管理对象
+        /// </summary>
+        /// <param name="logPath"></param>
+        /// <returns></returns>
+        public static LogManager CreateLogManager(string logPath)
+        {
+            return new LogManager(logPath);
+        }
 
         /*
          * @ 以异步方式启动写入日志
          * */
-        private static void WriteLocal(string text, LogType type, Exception ex)
+        private void WriteLocal(string text, LogType type, Exception ex)
         {
             AsyncWrite asyncWrite = new AsyncWrite(Write);
             IAsyncResult result = asyncWrite.BeginInvoke(text, type, ex, logRecordType, null, null);
@@ -41,11 +55,11 @@ namespace Perfor.Lib.Logs
          * @ type 日志类型
          * @ ex 异常信息，如果有
          * */
-        public static void WriteRemote(string url, string text, LogType type = LogType.INFO, Exception ex = null)
+        public void WriteRemote(string url, string text, LogType type = LogType.INFO, Exception ex = null)
         {
             if (string.IsNullOrEmpty(url))
                 throw new ArgumentNullException("必须配置日志服务器的完整URL");
-            AsyncWriteRemote asyncWrite = new AsyncWriteRemote(WrteToServer);
+            AsyncWriteRemote asyncWrite = new AsyncWriteRemote(WriteToServer);
             IAsyncResult result = asyncWrite.BeginInvoke(url, text, type, ex, null, null);
         }
 
@@ -56,7 +70,7 @@ namespace Perfor.Lib.Logs
          * @ type 日志类型
          * @ ex 异常信息，如果有
          * */
-        private static void WrteToServer(string url, string text, LogType type = LogType.INFO, Exception ex = null)
+        private void WriteToServer(string url, string text, LogType type = LogType.INFO, Exception ex = null)
         {
             lock (RemoteLock)
             {
@@ -81,9 +95,12 @@ namespace Perfor.Lib.Logs
         /**
          * @ 写入日志
          * */
-        private static void Write(string text, LogType type, Exception ex, LogRecordType recordType)
+        private void Write(string text, LogType type, Exception ex, LogRecordType recordType)
         {
-            string dir = string.Format(@"{0}\{1}\{2}\{3}",Directory.GetCurrentDirectory(), LogPath, DateTime.Now.ToString("yyyyMMdd"), type.ToString().ToLower());
+            if (string.IsNullOrEmpty(logpath))
+                throw new ArgumentNullException("必须设置属性LOGPATH的值，即日志文件夹的名称");
+
+            string dir = string.Format(@"{0}\{1}\{2}\{3}", Directory.GetCurrentDirectory(), logpath, DateTime.Now.ToString("yyyyMMdd"), type.ToString().ToLower());
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
             string df = dateFormarts[recordType.ToInt()];
@@ -117,7 +134,7 @@ namespace Perfor.Lib.Logs
          * @ text 信息
          * @ ex 发生的异常
          * */
-        public static void Info(string text)
+        public void Info(string text)
         {
             WriteLocal(text, LogType.INFO, null);
         }
@@ -127,7 +144,7 @@ namespace Perfor.Lib.Logs
          * @ text 自定义错误信息
          * @ ex 发生的异常
          * */
-        public static void Error(string text, Exception ex = null)
+        public void Error(string text, Exception ex = null)
         {
             WriteLocal(text, LogType.ERROR, ex);
         }
@@ -136,7 +153,7 @@ namespace Perfor.Lib.Logs
          * @ 写入一些警告信息
          * @ text 警告信息
          * */
-        public static void Warning(string text)
+        public void Warning(string text)
         {
             WriteLocal(text, LogType.WARNING, null);
 
@@ -147,7 +164,7 @@ namespace Perfor.Lib.Logs
          * @ text 调试信息
          * @ ex 发生的异常
          * */
-        public static void Debug(string text, Exception ex = null)
+        public void Debug(string text, Exception ex = null)
         {
             WriteLocal(text, LogType.DEBUG, ex);
         }

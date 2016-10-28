@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using Perfor.Lib.Models;
 using System.Net.Http;
 using Perfor.Lib.Common;
+using Microsoft.AspNetCore.Http;
 
 namespace Perfor.Lib.Web
 {
@@ -137,6 +138,25 @@ namespace Perfor.Lib.Web
             }
 
             return url;
+        }
+
+        /// <summary>
+        ///  获取客户端请求的真实IP地址
+        /// </summary>
+        /// <param name="req">客户端请求对象</param>
+        /// <returns></returns>
+        public static string GetRealIP(HttpRequest req)
+        {
+            string realip = string.Empty;
+            if (req == null)
+                return realip;
+            realip = req.Headers["x-real-ip"];
+            if (string.IsNullOrEmpty(realip))
+            {
+                realip = req.Host.Host;
+            }
+
+            return realip;
         }
     }
 }

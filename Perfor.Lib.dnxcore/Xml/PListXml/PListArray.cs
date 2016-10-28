@@ -145,6 +145,14 @@ namespace Perfor.Lib.Xml.PListXml
         }
         #endregion
 
+        #region Override
+        public override object Value
+        {
+            get { return this; }
+            set { base.Value = value; }
+        }
+        #endregion
+
         #region Properties
         /**
          * @ 重写父类属性

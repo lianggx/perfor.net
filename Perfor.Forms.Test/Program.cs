@@ -30,6 +30,8 @@ namespace Perfor.Forms.Test
 {
     static class Program
     {
+        private const string ENChar = "abcdefghjkmnpqrstuvwxyz";
+        private const string ENCharNumber = "23456789abcdefgh23456789jkmnpqrs23456789tuvwxyz";
 
         /// <summary>
         /// 应用程序的主入口点。k
@@ -37,6 +39,10 @@ namespace Perfor.Forms.Test
         [STAThread]
         static void Main()
         {
+           string hostName= System.Net.Dns.GetHostName();
+            IPHostEntry ip = Dns.GetHostEntry(hostName);
+            
+            Console.WriteLine(ip);
 
             Console.ReadKey();
 
@@ -384,5 +390,24 @@ WHERE D.ID='00000ddb92044fad8be0913b68697318'
     {
         public string Name { get; set; }
         public string TypeName { get; set; }
+    }
+
+    /// <summary>
+    ///  验证码样式类型
+    /// </summary>
+    public enum CodeStyleType
+    {
+        /// <summary>
+        /// 英文字母
+        /// </summary>
+        Char = 1,
+        /// <summary>
+        ///  中文字符
+        /// </summary>
+        Zh_cn = 2,
+        /// <summary>
+        ///  数字
+        /// </summary>
+        Number = 4
     }
 }

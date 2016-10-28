@@ -1,6 +1,7 @@
 ﻿using Perfor.Lib.Extension;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -73,26 +74,85 @@ namespace Perfor.Lib.Cryptography
         ///  加密字符串
         /// </summary>
         /// <param name="cryptText">待加密的内容</param>
+        /// <param name="isBlock">是否使用分块加密 keysize/8-11，默认false</param>
         /// <returns></returns>
-        public string Encrypt(string cryptText)
+        public string Encrypt(string cryptText, bool isBlock = false)
         {
             CreateRSAInstance();
-            byte[] data = Encoding.UTF8.GetBytes(cryptText);
-            byte[] cryptaData = rsa.Encrypt(data, padding);
-            return Convert.ToBase64String(cryptaData);
+            byte[] sourceData = Encoding.UTF8.GetBytes(cryptText);
+            byte[] encryptedData = null;
+            string result = string.Empty;
+            if (isBlock) //使用分块加密算法
+            {
+                // 加密块的长度 
+                int keySize = rsa.KeySize / 8 - 11;
+                byte[] buff = new byte[keySize];
+                MemoryStream inStream = new MemoryStream(sourceData);
+                int readLen = inStream.Read(buff, 0, keySize);
+                MemoryStream outStream = new MemoryStream();
+                while (readLen > 0)
+                {
+                    byte[] dataToEnc = new byte[readLen];
+                    Array.Copy(buff, 0, dataToEnc, 0, readLen);
+                    byte[] encData = rsa.Encrypt(dataToEnc, padding);
+                    outStream.Write(encData, 0, encData.Length);
+                    readLen = inStream.Read(buff, 0, keySize);
+                }
+                inStream.Dispose();
+                outStream.Position = 0;
+                encryptedData = outStream.ToArray();
+                outStream.Dispose();
+            }
+            else
+            {
+                encryptedData = rsa.Encrypt(sourceData, padding);
+            }
+            result = Convert.ToBase64String(encryptedData);
+
+            return result;
         }
 
         /// <summary>
         ///  解密字符串
         /// </summary>
         /// <param name="cryptText">带解密的内容</param>
+        /// <param name="isBlock">是否使用分块解密 keysize/8，默认false</param>
         /// <returns></returns>
-        public string Decrypt(string cryptText)
+        public string Decrypt(string cryptText, bool isBlock = false)
         {
+            string result = string.Empty;
+
             CreateRSAInstance();
-            byte[] cryptaData = Convert.FromBase64String(cryptText);
-            byte[] data = rsa.Decrypt(cryptaData, padding);
-            return Encoding.UTF8.GetString(data);
+            byte[] sourceData = Convert.FromBase64String(cryptText);
+            byte[] encryptedData = null;
+
+            if (isBlock) //使用分块加密算法
+            {
+                // 加密块的长度
+                int keySize = rsa.KeySize / 8;
+                byte[] buff = new byte[keySize];
+                MemoryStream inStream = new MemoryStream(sourceData);
+                int readLen = inStream.Read(buff, 0, keySize);
+                MemoryStream outStream = new MemoryStream();
+                while (readLen > 0)
+                {
+                    byte[] dataToEnc = new byte[readLen];
+                    Array.Copy(buff, 0, dataToEnc, 0, readLen);
+                    byte[] encData = rsa.Decrypt(dataToEnc, padding);
+                    outStream.Write(encData, 0, encData.Length);
+                    readLen = inStream.Read(buff, 0, keySize);
+                }
+                inStream.Dispose();
+                encryptedData = outStream.ToArray();
+                outStream.Dispose();
+            }
+            else
+            {
+                encryptedData = rsa.Decrypt(sourceData, padding);
+            }
+            result = Encoding.UTF8.GetString(encryptedData);
+
+            return result;
         }
 
         /// <summary>
@@ -113,10 +173,9 @@ namespace Perfor.Lib.Cryptography
         /// <returns></returns>
         public static string GenerateKey(bool includePrivateParameters = true, int keySize = 1024)
         {
-            RSA rsa = RSA.Create();
-            rsa.KeySize = keySize;
-            RSAParameters paramenter = rsa.ExportParameters(includePrivateParameters);
-
+            RSA rsager = RSA.Create();
+            rsager.KeySize = keySize;
+            RSAParameters paramenter = rsager.ExportParameters(includePrivateParameters);
             return paramenter.ObjToJson();
         }
 
@@ -128,14 +187,13 @@ namespace Perfor.Lib.Cryptography
         public string ExportParameters(bool includePrivateParameters = false)
         {
             CreateRSAInstance();
-             RSAParameters paramenter = rsa.ExportParameters(includePrivateParameters);
+            RSAParameters paramenter = rsa.ExportParameters(includePrivateParameters);
 
             return paramenter.ObjToJson();
         }
 
-
         #region Properties
-        private RSA rsa = RSA.Create();       
+        private RSA rsa = RSA.Create();
         /// <summary>
         ///  获取或者设置加密算法
         /// </summary>
@@ -165,7 +223,7 @@ namespace Perfor.Lib.Cryptography
             set { keysize = value; }
         }
 
-        private RSAEncryptionPadding padding = RSAEncryptionPadding.OaepSHA256;
+        private RSAEncryptionPadding padding = RSAEncryptionPadding.Pkcs1;
         /// <summary>
         ///  加密算法的填充强度，默认为 OaepSHA512
         /// </summary>
