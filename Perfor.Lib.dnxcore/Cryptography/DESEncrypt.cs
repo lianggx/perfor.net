@@ -10,7 +10,17 @@ namespace Perfor.Lib.Cryptography
 {
     public class DES3Encrypt
     {
-        public static string Decrypt(string Text, string sKey)
+        /// <summary>
+        ///  TripleDES 解密
+        /// </summary>
+        /// <remarks>
+        ///  Padding = PaddingMode.Zeros
+        ///  Mode = CipherMode.CBC
+        /// </remarks>
+        /// <param name="Text"></param>
+        /// <param name="sKey">24位长度key</param>
+        /// <returns></returns>
+        public static string TripleDES_Decrypt(string Text, string sKey)
         {
             TripleDES provider = TripleDES.Create();
             int num = Text.Length / 2;
@@ -31,7 +41,17 @@ namespace Perfor.Lib.Cryptography
             return Convert.ToBase64String(buffer, 0, Convert.ToInt32(dencryptStream.Length, CultureInfo.InvariantCulture));
         }
 
-        public static string Encrypt(string Text, string sKey)
+        /// <summary>
+        ///  TripleDES 加密
+        /// </summary>
+        /// <remarks>
+        ///  Padding = PaddingMode.Zeros
+        ///  Mode = CipherMode.CBC
+        /// </remarks>
+        /// <param name="Text"></param>
+        /// <param name="sKey">24位长度key</param>
+        /// <returns></returns>
+        public static string TripleDES_Encrypt(string Text, string sKey)
         {
             TripleDES provider = TripleDES.Create();
             byte[] bytes = Encoding.UTF8.GetBytes(Text);

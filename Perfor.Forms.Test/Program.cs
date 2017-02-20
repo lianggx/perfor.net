@@ -39,9 +39,9 @@ namespace Perfor.Forms.Test
         [STAThread]
         static void Main()
         {
-           string hostName= System.Net.Dns.GetHostName();
+            string hostName = System.Net.Dns.GetHostName();
             IPHostEntry ip = Dns.GetHostEntry(hostName);
-            
+
             Console.WriteLine(ip);
 
             Console.ReadKey();
@@ -311,13 +311,22 @@ WHERE D.ID='00000ddb92044fad8be0913b68697318'
         {
             XmlDict xd = new XmlDict();
             xd.Load("ms-persist.xml");
-            //string v1 = xd["recipename"].Value.ToString();
-            //IPListNode l3 = xd["ingredlist"]["listitem 3"];
-            //string v2 = l3.ToXmlString();
-            //Console.WriteLine("{0},{1},{2}", l3.Tag, l3.Order, l3.Value);
+            string v1 = xd["recipename"].Value.ToString();
+            IPListNode l3 = xd["ingredlist"]["listitem 3"];
+            string v2 = l3.ToXmlString();
+            Console.WriteLine("{0},{1},{2}", l3.Tag, l3.Order, l3.Value);
             int count = xd.Items.Count;
-            //Console.WriteLine(v1);
+            Console.WriteLine(v1);
             Console.WriteLine(count);
+        }
+
+        public static IPListNode test2(IPListNode dict, string key)
+        {
+            IPListNode node = dict[key];
+            if (node == null)
+                return null;
+
+            return test2(node, key);
         }
         #endregion
 

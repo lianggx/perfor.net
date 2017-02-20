@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Perfor.Lib.Common
 {
-    /**
-     * @ 时间段枚举
-     * */
+    /// <summary>
+    ///  时间段枚举
+    /// </summary>
     public enum DateInterval
     {
         Day,
@@ -22,36 +22,44 @@ namespace Perfor.Lib.Common
         Year
     }
 
-    /**
-     * @ 定义日期和时间处理的业务逻辑
-     * */
+    /// <summary>
+    ///  定义日期和时间处理的业务逻辑
+    /// </summary>
     public class DateAndTime
     {
-        /*
-         * @ 取两个日期间的差值，与 SQL 里面的同名函数功能相同
-         * */
+        /// <summary>
+        ///  取两个日期间的差值，与 SQL 里面的同名函数功能相同
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <param name="dt1"></param>
+        /// <param name="dt2"></param>
+        /// <returns></returns>
         public static long DateDiff(DateInterval interval, DateTime dt1, DateTime dt2)
         {
             return DateDiff(interval, dt1, dt2, System.Globalization.DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek);
         }
 
-        /**
-         * @ 获取季度
-         * */
+        /// <summary>
+        ///  获取季度
+        /// </summary>
+        /// <param name="nMonth"></param>
+        /// <returns></returns>
         private static int GetQuarter(int nMonth)
         {
-            if (nMonth <= 3)
-                return 1;
-            if (nMonth <= 6)
-                return 2;
-            if (nMonth <= 9)
-                return 3;
+            if (nMonth <= 3) return 1;
+            if (nMonth <= 6) return 2;
+            if (nMonth <= 9) return 3;
             return 4;
         }
 
-        /*
-         * @ 取两个日期间的差值，与 SQL 里面的同名函数功能相同
-         * */
+        /// <summary>
+        ///  取两个日期间的差值，与 SQL 里面的同名函数功能相同
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <param name="dt1"></param>
+        /// <param name="dt2"></param>
+        /// <param name="eFirstDayOfWeek"></param>
+        /// <returns></returns>
         public static long DateDiff(DateInterval interval, DateTime dt1, DateTime dt2, DayOfWeek eFirstDayOfWeek)
         {
             if (interval == DateInterval.Year)
@@ -102,6 +110,11 @@ namespace Perfor.Lib.Common
 
         }
 
+        /// <summary>
+        ///  获取一个数的最大/最小的整数值
+        /// </summary>
+        /// <param name="dVal"></param>
+        /// <returns></returns>
         private static long Round(double dVal)
         {
             if (dVal >= 0)

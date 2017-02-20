@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace dywebsdk.Common
 {
+    /// <summary>
+    ///   压缩流帮助类
+    /// </summary>
     public class GZipStreamHelper
     {
         /// <summary>
@@ -44,6 +47,11 @@ namespace dywebsdk.Common
             return deData;
         }
 
+        /// <summary>
+        ///  从流中读取字节
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
         private static byte[] ReadByteStream(Stream stream)
         {
             byte[] data = null;

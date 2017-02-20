@@ -559,6 +559,26 @@ namespace Perfor.Lib.Extension
 
             return val;
         }
+
+        /// <summary>
+        ///  将一个字典使用指定的分隔符号进行格式化后输出
+        /// </summary>
+        /// <param name="value">字典</param>
+        /// <returns></returns>
+        public static string ToUrlParams(this IDictionary value)
+        {
+            if (value == null || value.Count == 0)
+                return "";
+            StringBuilder text = new StringBuilder();
+            foreach (var key in value.Keys)
+            {
+                text.AppendFormat("{0}={1}&", key, value[key]);
+            }
+            string val = text.ToString();
+            val = val.Substring(0, val.Length - 1);
+
+            return val;
+        }
         #endregion
 
         #region Base64.To

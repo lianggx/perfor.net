@@ -8,6 +8,7 @@ using Perfor.Lib.Models;
 using System.Net.Http;
 using Perfor.Lib.Common;
 using Microsoft.AspNetCore.Http;
+using System.Reflection;
 
 namespace Perfor.Lib.Web
 {
@@ -157,6 +158,33 @@ namespace Perfor.Lib.Web
             }
 
             return realip;
+        }
+
+        /// <summary>
+        ///  反射调用多参数可以定制编码的方法
+        /// </summary>
+        /// <param name="text">待解码的字符串</param>
+        /// <param name="encoding">目标编码类型</param>
+        /// <returns></returns>
+        public static string UrlDecode(string text, Encoding encoding)
+        {
+            object value = null;
+            // 反射调用 WebUtility.UrlDecoding
+            Type wu = typeof(WebUtility);
+            MethodInfo[] infos = wu.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+            for (int i = 0; i < infos.Length; i++)
+            {
+                string name = infos[i].ToString();
+                if (name == "System.String UrlDecodeInternal(System.String, System.Text.Encoding)")
+                {
+                    value = infos[i].Invoke(null, new object[] { text, encoding });
+                    break;
+                }
+            }
+
+            if (value == null) return null;
+
+            return value.ToString();
         }
     }
 }

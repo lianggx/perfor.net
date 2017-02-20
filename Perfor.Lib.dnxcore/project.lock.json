@@ -3,6 +3,30 @@
   "version": 2,
   "targets": {
     ".NETStandard,Version=v1.6": {
+      "CoreCompat.System.Drawing/1.0.0-beta006": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Win32.Primitives": "4.0.1",
+          "System.Collections.NonGeneric": "4.0.1",
+          "System.Collections.Specialized": "4.0.1",
+          "System.ComponentModel.TypeConverter": "4.1.0",
+          "System.Drawing.Primitives": "4.0.0",
+          "System.IO.FileSystem": "4.0.1",
+          "System.Reflection.TypeExtensions": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Runtime.InteropServices": "4.1.0",
+          "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
+          "System.Text.Encoding.Extensions": "4.0.11",
+          "System.Text.RegularExpressions": "4.1.0",
+          "System.Threading": "4.0.11"
+        },
+        "compile": {
+          "lib/netstandard1.3/CoreCompat.System.Drawing.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/CoreCompat.System.Drawing.dll": {}
+        }
+      },
       "Microsoft.AspNetCore.Http.Abstractions/1.0.0": {
         "type": "package",
         "dependencies": {
@@ -1513,36 +1537,21 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XmlSerializer.dll": {}
         }
-      },
-      "ZKWeb.System.Drawing/1.0.1": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Win32.Primitives": "4.0.1",
-          "System.Collections.NonGeneric": "4.0.1",
-          "System.Collections.Specialized": "4.0.1",
-          "System.ComponentModel.TypeConverter": "4.1.0",
-          "System.Console": "4.0.0",
-          "System.Diagnostics.Debug": "4.0.11",
-          "System.Drawing.Primitives": "4.0.0",
-          "System.IO.FileSystem": "4.0.1",
-          "System.Reflection.TypeExtensions": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0",
-          "System.Runtime.InteropServices": "4.1.0",
-          "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
-          "System.Text.Encoding.Extensions": "4.0.11",
-          "System.Text.RegularExpressions": "4.1.0",
-          "System.Threading": "4.0.11"
-        },
-        "compile": {
-          "lib/netstandard1.5/ZKWeb.System.Drawing.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.5/ZKWeb.System.Drawing.dll": {}
-        }
       }
     }
   },
   "libraries": {
+    "CoreCompat.System.Drawing/1.0.0-beta006": {
+      "sha512": "KOBeVy8FHx9zkXrIZAM8OdXPrimROmvfB02fOegrYIelNN/zWhsOwzONgD7gw7wOTJgAFfdwpme5CiMraJj47Q==",
+      "type": "package",
+      "path": "CoreCompat.System.Drawing/1.0.0-beta006",
+      "files": [
+        "CoreCompat.System.Drawing.1.0.0-beta006.nupkg.sha512",
+        "CoreCompat.System.Drawing.nuspec",
+        "lib/net45/CoreCompat.System.Drawing.dll",
+        "lib/netstandard1.3/CoreCompat.System.Drawing.dll"
+      ]
+    },
     "Microsoft.AspNetCore.Http.Abstractions/1.0.0": {
       "sha512": "OJHlqdJOWKKBfsiVdX4Z4KCNuqvBIu6+1MVKuejRDyHnGyMkNHNoP/dtVzhPqvJXaJg9N4HlD0XNc6GDCFVffg==",
       "type": "package",
@@ -5451,21 +5460,11 @@
         "ref/xamarinwatchos10/_._",
         "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll"
       ]
-    },
-    "ZKWeb.System.Drawing/1.0.1": {
-      "sha512": "3b1e75VDesKiUagKFIk8U37A0k+eZqWKXeyxzgo1Y7T2AfjJ1qLe8AFW/xI66oyqvrBrDWzw3HDSKVV3N1z1Mw==",
-      "type": "package",
-      "path": "ZKWeb.System.Drawing/1.0.1",
-      "files": [
-        "ZKWeb.System.Drawing.1.0.1.nupkg.sha512",
-        "ZKWeb.System.Drawing.nuspec",
-        "lib/net45/ZKWeb.System.Drawing.dll",
-        "lib/netstandard1.5/ZKWeb.System.Drawing.dll"
-      ]
     }
   },
   "projectFileDependencyGroups": {
     "": [
+      "CoreCompat.System.Drawing >= 1.0.0-beta006",
       "Microsoft.AspNetCore.Http.Abstractions >= 1.0.0",
       "Microsoft.AspNetCore.Http.Features >= 1.0.0",
       "NETStandard.Library >= 1.6.0",
@@ -5480,8 +5479,7 @@
       "System.Reflection.TypeExtensions >= 4.1.0",
       "System.Xml.ReaderWriter >= 4.0.11",
       "System.Xml.XmlDocument >= 4.0.1",
-      "System.Xml.XmlSerializer >= 4.0.11",
-      "ZKWeb.System.Drawing >= 1.0.1"
+      "System.Xml.XmlSerializer >= 4.0.11"
     ],
     ".NETStandard,Version=v1.6": []
   },
