@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perfor.Lib", "Perfor.Lib\Perfor.Lib.csproj", "{C7698B2D-0B92-480D-A56A-DC27BBA51040}"
 EndProject
@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perfor.Forms.Test", "Perfor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perfor.Authority", "Perfor.Authority\Perfor.Authority.csproj", "{EC8DE435-30FA-47FF-92F4-684F28C1A081}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Perfor.Lib.dnxcore", "Perfor.Lib.dnxcore\Perfor.Lib.dnxcore.xproj", "{06C56C9C-C054-4F77-888E-1F40B5A044E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perfor.Lib.dnxcore", "Perfor.Lib.dnxcore\Perfor.Lib.dnxcore.csproj", "{B3B360FE-9C18-42B8-96A1-52017A9554E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +29,15 @@ Global
 		{EC8DE435-30FA-47FF-92F4-684F28C1A081}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC8DE435-30FA-47FF-92F4-684F28C1A081}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC8DE435-30FA-47FF-92F4-684F28C1A081}.Release|Any CPU.Build.0 = Release|Any CPU
-		{06C56C9C-C054-4F77-888E-1F40B5A044E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{06C56C9C-C054-4F77-888E-1F40B5A044E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{06C56C9C-C054-4F77-888E-1F40B5A044E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{06C56C9C-C054-4F77-888E-1F40B5A044E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3B360FE-9C18-42B8-96A1-52017A9554E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3B360FE-9C18-42B8-96A1-52017A9554E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3B360FE-9C18-42B8-96A1-52017A9554E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3B360FE-9C18-42B8-96A1-52017A9554E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {932D2B05-5A64-4E6A-9B18-9286E7DD0E70}
 	EndGlobalSection
 EndGlobal

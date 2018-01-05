@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <Authors>lgx</Authors>
+    <Company>lianggx@foxmail.com</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Gma.QrCodeNet.Encoding" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+</Project>
