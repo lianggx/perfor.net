@@ -187,3 +187,7 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+/.vs/Perfor.Net/v15/Server/sqlite3
+*.ide-shm
+*.ide-wal
+*.lock

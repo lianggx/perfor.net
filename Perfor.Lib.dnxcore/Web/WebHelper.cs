@@ -31,12 +31,22 @@ namespace Perfor.Lib.Web
         /// <returns></returns>
         public static string GetFrom(string url)
         {
-            HttpWebRequest request = Create(url);
-            using (WebResponse response = (HttpWebResponse)request.GetResponseAsync().Result)
+            HttpWebRequest request = null;
+            string result = string.Empty;
+            try
             {
-                StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                return reader.ReadToEnd();
+                request = Create(url);
+                using (WebResponse response = (HttpWebResponse)request.GetResponseAsync().Result)
+                {
+                    StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                    result = reader.ReadToEnd();
+                }
+                request.Abort();
             }
+            catch (Exception ex) { throw ex; }
+            finally { System.GC.Collect(); }
+
+            return result;
         }
 
         /// <summary>
@@ -47,26 +57,36 @@ namespace Perfor.Lib.Web
         /// <returns></returns>
         public static string PostTo(string url, string data)
         {
-            Uri uri = new Uri(url);
-            if (!string.IsNullOrEmpty(uri.Query))
+            HttpWebRequest request = null;
+            string result = string.Empty;
+            try
             {
-                data = string.Format("{0}&{1}", uri.Query.Substring(1), data);
+                Uri uri = new Uri(url);
+                if (!string.IsNullOrEmpty(uri.Query))
+                {
+                    data = string.Format("{0}&{1}", uri.Query.Substring(1), data);
+                }
+                url = Utilities.UrlSubParser(url);
+                request = Create(url);
+                request.ContentType = "application/x-www-form-urlencoded";
+                byte[] bytes = Encoding.UTF8.GetBytes(data);
+                request.Method = "POST";
+                using (Stream stream = request.GetRequestStreamAsync().Result)
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                    stream.Flush();
+                }
+                using (WebResponse response = request.GetResponseAsync().Result)
+                {
+                    StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                    result = reader.ReadToEnd();
+                }
+                request.Abort();
             }
-            url = Utilities.UrlSubParser(url);
-            HttpWebRequest request = Create(url);
-            request.ContentType = "application/x-www-form-urlencoded";
-            byte[] bytes = Encoding.UTF8.GetBytes(data);
-            request.Method = "POST";
-            using (Stream stream = request.GetRequestStreamAsync().Result)
-            {
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Flush();
-            }
-            using (WebResponse response = request.GetResponseAsync().Result)
-            {
-                StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                return reader.ReadToEnd();
-            }
+            catch (Exception ex) { throw ex; }
+            finally { System.GC.Collect(); }
+
+            return result;
         }
 
         /// <summary>
@@ -139,25 +159,6 @@ namespace Perfor.Lib.Web
             }
 
             return url;
-        }
-
-        /// <summary>
-        ///  获取客户端请求的真实IP地址
-        /// </summary>
-        /// <param name="req">客户端请求对象</param>
-        /// <returns></returns>
-        public static string GetRealIP(HttpRequest req)
-        {
-            string realip = string.Empty;
-            if (req == null)
-                return realip;
-            realip = req.Headers["x-real-ip"];
-            if (string.IsNullOrEmpty(realip))
-            {
-                realip = req.Host.Host;
-            }
-
-            return realip;
         }
 
         /// <summary>
